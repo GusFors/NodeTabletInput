@@ -1,11 +1,27 @@
 let HID = require('node-hid')
 let robot = require('robotjs')
+let colors = require('colors')
+let draftLog = require('draftlog')
+draftLog(console)
 
 let yScale
 let xScale = 0.16842105263157894736842105263158
 let isForcedProportions = process.argv.includes('-f')
 
 isForcedProportions ? (yScale = 0.16842105263157894736842105263158) : (yScale = 0.15157894736842105263157894736842)
+
+let config = {
+  vendorId: 1386,
+  productId: 782,
+  path: '\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}',
+  serialNumber: '\t',
+  manufacturer: 'Wacom Co.,Ltd.',
+  product: 'Intuos PS',
+  release: 256,
+  interface: -1,
+  usagePage: 65280,
+  usage: 10,
+}
 
 if (process.argv.includes('-d')) {
   let devices = HID.devices()
@@ -14,15 +30,22 @@ if (process.argv.includes('-d')) {
   process.exit()
 }
 
-let tabletDevice = new HID.HID('\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}')
+let tabletDevice = new HID.HID(config.path)
 robot.setMouseDelay(0)
 
 let intervalData
 let x
 let y
 
+let reportsPerSec = 0
+setInterval(() => {
+  repPerSecUpdate('RPS: ~' + reportsPerSec)
+  reportsPerSec = 0
+}, 1000)
+
 tabletDevice.on('data', (reportData) => {
   intervalData = reportData
+  reportsPerSec++
 
   x = reportData[3] | (reportData[4] << 8)
   y = reportData[5] | (reportData[6] << 8)
@@ -35,23 +58,31 @@ tabletDevice.on('data', (reportData) => {
   //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 })
 
+let rawUpdate = console.draft('')
+let xPosUpdate = console.draft('')
+let yPosUpdate = console.draft('')
+let unscaledUpdate = console.draft('')
+let screenPosUpdate = console.draft('')
+let reportIdUpdate = console.draft('')
+let penTipUpdate = console.draft('')
+let forcedPropUpdate = console.draft(`forcedProportions:`, isForcedProportions ? `${isForcedProportions}`.green : `${isForcedProportions}`.red)
+let repPerSecUpdate = console.draft('RPS:')
+
 setInterval(() => {
-  console.clear()
-  console.log(`Full Raw data:`, intervalData)
-  console.log(`raw xPosition: `, intervalData.slice(3, 5))
-  console.log(`raw yPosition:`, intervalData.slice(5, 7))
 
-  console.log(`current unscaled Position: [x:`, x, ', y:', y, ']')
-  console.log(`xScreen: ${Math.round(x * xScale)} yScreen: ${Math.round(y * yScale)}`)
-  console.log(`reportID: ${intervalData[2] >> 1}`) // reportID
+  rawUpdate(`Full Raw data:`, intervalData)
+  xPosUpdate(`raw xPosition: `, intervalData.slice(3, 5))
+  yPosUpdate(`raw yPosition:`, intervalData.slice(5, 7))
 
-  console.log(`Pen tip is pressed: ${intervalData[2] === 241}`)
-  console.log(`forcedProportions: ${isForcedProportions}`)
-  // x = intervalData[3] | (intervalData[4] << 8)
-  // y = intervalData[5] | (intervalData[6] << 8)
+  unscaledUpdate(`current unscaled Position: [x:`, x, ', y:', y, ']')
+  screenPosUpdate(`xScreen: ${Math.round(x * xScale)} yScreen: ${Math.round(y * yScale)}`)
+  reportIdUpdate(`reportID: ${intervalData[2] >> 1}`) // reportID
+
+  penTipUpdate(`Pen tip is pressed:`, intervalData[2] === 241 ? `${intervalData[2] === 241}`.green : `${intervalData[2] === 241}`.red)
+  //console.log(`forcedProportions:`, isForcedProportions ? `${isForcedProportions}`.green : `${isForcedProportions}`.red)
   //intervalData.slice(3, 5).reverse() gammalt sätt
   //intervalData.slice(5, 7).reverse()
-}, 100)
+}, 50)
 
 // in case of being unable to exit while testing
 setTimeout(() => {
