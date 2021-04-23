@@ -20,7 +20,8 @@ tabletDevice.on('data', (reportData) => {
   x = reportData[3] | (reportData[4] << 8)
   y = reportData[5] | (reportData[6] << 8)
 
-  robot.moveMouse(Math.round(x * 0.16842), Math.round(y * 0.1515789))
+  x === 0 ? false : y === 0 ? false : robot.moveMouse(Math.round(x * 0.16842), Math.round(y * 0.1515789))
+
   //console.log(`xScreen: ${Math.round(x * 0.16842)} yScreen: ${Math.round(y * 0.1515789)}`)
 })
 
@@ -43,4 +44,4 @@ setInterval(() => {
 setTimeout(() => {
   process.exit()
   //robot.moveMouse(0, 0)
-}, 6000)
+}, 300000)
