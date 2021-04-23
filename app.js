@@ -3,7 +3,7 @@ let robot = require('robotjs')
 
 let yScale
 let xScale = 0.16842105263157894736842105263158
-let isForcedProportions = process.argv.includes('-f') ? true : false
+let isForcedProportions = process.argv.includes('-f')
 
 isForcedProportions ? (yScale = 0.16842105263157894736842105263158) : (yScale = 0.15157894736842105263157894736842)
 
