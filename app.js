@@ -12,7 +12,7 @@ let intervalData
 tabletDevice.on('data', (data) => {
   intervalData = data
 })
-Array.prototype.slice
+
 setInterval(() => {
   console.clear()
   console.log(`Full Raw data:`, intervalData)
@@ -27,23 +27,3 @@ setInterval(() => {
 
   console.log(`current Position: [x:`, x, ', y:', y, ']')
 }, 100)
-
-// https://stackoverflow.com/questions/14963182/how-to-convert-last-4-bytes-in-an-array-to-an-integer
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer#instance-methods
-
-// https://stackoverflow.com/questions/4024429/what-does-a-single-vertical-bar-mean-in-javascript
-// https://stackoverflow.com/questions/49951290/javascript-simple-bitconverter
-// https://stackoverflow.com/questions/5528119/double-more-than-symbol-in-javascript
-//https://www.mathsisfun.com/binary-decimal-hexadecimal-converter.html
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Left_shift
-
-// 60 3b = 15200??? decimalt 96 59, 3b60 visade sig tydligen vara 15200, max x
-// 251C = 9500, alltså max y
-
-// dotnet run --framework dotnet 5.0.102
-// kör dotnet build i daemonfolder för jämförelser
-
-// console.log(intervalData.slice(3, 5).toString('hex'))
-// console.log(parseInt(intervalData.slice(3, 5).toString('hex')))
-//console.log(parseInt(toString('hex'), 16))
-// https://github.com/octalmage/robotjs röra musen?
