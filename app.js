@@ -1,7 +1,12 @@
 let HID = require('node-hid')
 let robot = require('robotjs')
 
-if (process.argv[2] === 'd') {
+let yScale
+let xScale = 0.16842105263157894736842105263158
+
+process.argv.includes('-f') ? (yScale = 0.16842105263157894736842105263158) : (yScale = 0.15157894736842105263157894736842)
+
+if (process.argv.includes('-d')) {
   let devices = HID.devices()
   console.log(devices)
   //tabletDevice.getFeatureReport(64, 11)
@@ -21,8 +26,12 @@ tabletDevice.on('data', (reportData) => {
   x = reportData[3] | (reportData[4] << 8)
   y = reportData[5] | (reportData[6] << 8)
 
-  x === 0 ? false : y === 0 ? false : robot.moveMouse(Math.round(x * 0.16842), Math.round(y * 0.1515789))
-  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
+  if (y > 8550) {
+    y = 8550
+  }
+
+  x === 0 ? false : y === 0 ? false : robot.moveMouse(Math.round(x * xScale), Math.round(y * yScale))
+  //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 })
 
 setInterval(() => {
