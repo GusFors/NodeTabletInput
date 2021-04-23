@@ -5,6 +5,7 @@ if (process.argv[2] === 'd') {
   let devices = HID.devices()
   console.log(devices)
   //tabletDevice.getFeatureReport(64, 11)
+  process.exit()
 }
 
 let tabletDevice = new HID.HID('\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}')
@@ -21,8 +22,7 @@ tabletDevice.on('data', (reportData) => {
   y = reportData[5] | (reportData[6] << 8)
 
   x === 0 ? false : y === 0 ? false : robot.moveMouse(Math.round(x * 0.16842), Math.round(y * 0.1515789))
-  intervalData[2] === 241 ? robot.mouseClick('left', false) : false
-  //console.log(`xScreen: ${Math.round(x * 0.16842)} yScreen: ${Math.round(y * 0.1515789)}`)
+  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 })
 
 setInterval(() => {
@@ -41,6 +41,7 @@ setInterval(() => {
   console.log(`xScreen: ${Math.round(x * 0.16842)} yScreen: ${Math.round(y * 0.1515789)}`)
 }, 100)
 
+// in case of being unable to exit while testing
 setTimeout(() => {
   process.exit()
   //robot.moveMouse(0, 0)
