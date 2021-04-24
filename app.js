@@ -44,18 +44,23 @@ setInterval(() => {
   reportsPerSec = 0
 }, 1000)
 
+// setTimeout(() => {
+//   robot.moveMouse(0,0)
+// }, 2000);
+
 tabletDevice.on('data', (reportData) => {
   intervalData = reportData
   reportsPerSec++
 
-  x = reportData[3] | (reportData[4] << 8)
+  x = reportData[3] | (reportData[4] << 8) | ((reportData[9]) & 1)
   y = reportData[5] | (reportData[6] << 8)
 
   if (y > 8550 && isForcedProportions) {
     y = 8550
   }
-
-  x === 0 ? false : y === 0 ? false : robot.moveMouse(Math.round(x * xScale), Math.round(y * yScale))
+  //console.log(x)
+  // TODO x=0 kommer för tidigt
+  x === 0 ? false : y === 0 ? false : robot.moveMouse(x * xScale, y * yScale) // fixa så att ett 0-värde inte blockerar det andra värdet från att sättas
   //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 
   if (reportData[2] === 241) {
@@ -77,7 +82,7 @@ let reportIdUpdate = console.draft('')
 let penTipUpdate = console.draft('')
 let forcedPropUpdate = console.draft(`forcedProportions:`, isForcedProportions ? `${isForcedProportions}`.green : `${isForcedProportions}`.red)
 let repPerSecUpdate = console.draft('RPS:')
-
+let outsideAreaUpdate = console.draft('outside:')
 
 setInterval(
   () => {
@@ -90,6 +95,7 @@ setInterval(
     reportIdUpdate(`reportID: ${intervalData[2] >> 1}`) // reportID
 
     penTipUpdate(`Pen tip is pressed:`, intervalData[2] === 241 ? `${intervalData[2] === 241}`.green : `${intervalData[2] === 241}`.red)
+    outsideAreaUpdate(intervalData.slice(9, 10))
     //console.log(`forcedProportions:`, isForcedProportions ? `${isForcedProportions}`.green : `${isForcedProportions}`.red)
     //intervalData.slice(3, 5).reverse() gammalt sätt
     //intervalData.slice(5, 7).reverse()
