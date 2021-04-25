@@ -42,6 +42,7 @@ let x
 let y
 let reportsPerSec = 0
 let isClickHold = false
+let clickTimeout
 
 if (isDraftLog) {
   let repPerSecUpdate = console.draft('RPS:')
@@ -68,26 +69,48 @@ tabletDevice.on('data', (reportData) => {
   //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
   x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // fixa så att ett 0-värde inte blockerar det andra värdet från att sättas
 
-  // TODO fix hold instead of this crap
-  if (reportData[2] > 241) {
-    if (isClickHold === false) {
-      robot.mouseClick('right', false)
-      setTimeout(() => {
-        isClickHold = false
-      }, 500)
-    }
-    isClickHold = true
-  }
-
   if (reportData[2] === 241) {
     if (isClickHold === false) {
-      robot.mouseClick('left', false)
-      setTimeout(() => {
-        isClickHold = false
-      }, 500)
+      //    robot.mouseClick('left', false)
+      robot.mouseToggle('down', 'left')
+      isClickHold = true
     }
-    isClickHold = true
   }
+
+  if (reportData[2] > 241) {
+    if (isClickHold === false) {
+      // robot.mouseClick('left', false)
+      robot.mouseToggle('down', 'left')
+      isClickHold = true
+    }
+  }
+
+  if (reportData[2] === 240) {
+    isClickHold = false
+
+    robot.mouseToggle('up', 'left')
+  }
+
+  // // TODO fix hold instead of this crap
+  // if (reportData[2] > 241) {
+  //   if (isClickHold === false) {
+  //     robot.mouseClick('right', false)
+  //     setTimeout(() => {
+  //       isClickHold = false
+  //     }, 500)
+  //     isClickHold = true
+  //   }
+  // }
+
+  // if (reportData[2] === 241) {
+  //   if (isClickHold === false) {
+  //     robot.mouseClick('left', false)
+  //     setTimeout(() => {
+  //       isClickHold = false
+  //     }, 500)
+  //     isClickHold = true
+  //   }
+  // }
 })
 
 if (isDraftLog) {
