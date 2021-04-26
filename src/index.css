@@ -21,6 +21,7 @@ body {
   background-color: rgb(57, 68, 83);
   zoom: 20%;
   box-shadow: 1px 1px 12px 7px rgba(22, 22, 22, 0.493);
+  border: medium solid rgba(130, 139, 139, 0.801);
 }
 
 #areamirror {
@@ -29,15 +30,16 @@ body {
   background-color: rgb(57, 68, 83);
   zoom: 5%;
   box-shadow: 1px 1px 12px 7px rgba(22, 22, 22, 0.493);
+  border: medium solid rgba(218, 231, 231, 0.801);
 }
 
 #areaoverlaymirror {
   width: 2560px;
   height: 1440px;
-  background-color: rgba(77, 165, 165, 0.637);
+  /* border: medium solid rgba(28, 180, 173, 0.801); */
   zoom: 5%;
   margin-left: -2560px;
-  box-shadow: 1px 1px 12px 7px rgba(22, 22, 22, 0.493);
+ 
 }
 
 #forcebox {
@@ -102,7 +104,6 @@ legend {
   margin: 10px;
   margin-top: -10px;
 }
-
 
 #leftrightwrapper {
   display: table; /* 2. display flex to the rescue */

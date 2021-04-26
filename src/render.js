@@ -4,6 +4,26 @@ const screenMirror = document.querySelector('#monitormirror')
 const screenMirrorContext = screenMirror.getContext('2d')
 screenMirrorContext.fillStyle = 'rgb(0,190,250)'
 
+const areaOverlayMirror = document.querySelector('#areaoverlaymirror')
+const areaOverlayContext = areaOverlayMirror.getContext('2d')
+
+const areaTextColor = 'rgba(255, 255, 255, 1)'
+const areaOverlayColor = 'rgba(64,224,208, 0.7)'
+areaOverlayContext.fillStyle = areaOverlayColor
+areaOverlayContext.textAlign = 'center'
+areaOverlayContext.font = '2000px serif'
+
+if (document.querySelector('#forcebox').checked) {
+  areaOverlayContext.fillRect(0, 0, 15200, 8550)
+  areaOverlayContext.fillStyle = areaTextColor
+  areaOverlayContext.fillText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+  areaOverlayContext.strokeText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+} else {
+  areaOverlayContext.fillRect(0, 0, 15200, 9500)
+  areaOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)'
+  areaOverlayContext.fillText((15200 / 9500).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+}
+
 ipc.on('message', (event, positionData) => {
   // console.log(message) // logs out "Hello second window!"
   //console.log(positionData[1])
@@ -38,4 +58,22 @@ document.querySelector('#forcebox').onclick = (event) => {
     id: 'forcebox',
     value: document.querySelector('#forcebox').checked,
   })
+
+  areaOverlayContext.clearRect(0, 0, areaOverlayMirror.width, areaOverlayMirror.height)
+
+  // areaOverlayContext.fillStyle = 'rgba(255, 165, 0, 1)'
+  // areaOverlayContext.strokeStyle = 'red'
+  // document.querySelector('#forcebox').checked ? areaOverlayContext.fillRect(0, 0, 15300, 8600) : areaOverlayContext.fillRect(0, 0, 15300, 9600)
+
+  areaOverlayContext.fillStyle = areaOverlayColor
+
+  if (document.querySelector('#forcebox').checked) {
+    areaOverlayContext.fillRect(0, 0, 15200, 8550)
+    areaOverlayContext.fillStyle = areaTextColor
+    areaOverlayContext.fillText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+  } else {
+    areaOverlayContext.fillRect(0, 0, 15200, 9500)
+    areaOverlayContext.fillStyle = areaTextColor
+    areaOverlayContext.fillText((15200 / 9500).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+  }
 }
