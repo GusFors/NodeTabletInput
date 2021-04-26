@@ -43,19 +43,28 @@ let y
 let reportsPerSec = 0
 let isClickHold = false
 let clickTimeout
+let isToggle = false
 
-if (isDraftLog) {
-  let repPerSecUpdate = console.draft('RPS:')
-  setInterval(() => {
-    repPerSecUpdate('RPS: ~' + reportsPerSec)
-    reportsPerSec = 0
-  }, 1000)
-}
+let repPerSecUpdate = console.draft('RPS:')
+setInterval(() => {
+  repPerSecUpdate('RPS: ~' + reportsPerSec)
+  reportsPerSec = 0
+}, 1000)
+
+// setInterval(() => {
+//   console.log(intervalData[7])
+// }, 500);
 
 tabletDevice.on('data', (reportData) => {
   intervalData = reportData
   reportsPerSec++
 
+  // Broken/no data?
+  if (reportData[1] != 2) {
+    return
+  }
+
+  // TODO check if these really are correct for all positions
   x = reportData[3] | (reportData[4] << 8)
   y = reportData[5] | (reportData[6] << 8)
 
@@ -66,51 +75,22 @@ tabletDevice.on('data', (reportData) => {
   xS = x * xScale
   yS = y * yScale
 
-  //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
-  x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // fixa så att ett 0-värde inte blockerar det andra värdet från att sättas
-
-  if (reportData[2] === 241) {
+  // pressure
+  if (reportData[7] > 0) {
     if (isClickHold === false) {
-      //    robot.mouseClick('left', false)
       robot.mouseToggle('down', 'left')
       isClickHold = true
     }
   }
 
-  if (reportData[2] > 241) {
-    if (isClickHold === false) {
-      // robot.mouseClick('left', false)
-      robot.mouseToggle('down', 'left')
-      isClickHold = true
-    }
-  }
-
-  if (reportData[2] === 240) {
+  if (reportData[7] === 0) {
+    // console.log('no pressure'.red)
     isClickHold = false
-
     robot.mouseToggle('up', 'left')
   }
+  //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 
-  // // TODO fix hold instead of this crap
-  // if (reportData[2] > 241) {
-  //   if (isClickHold === false) {
-  //     robot.mouseClick('right', false)
-  //     setTimeout(() => {
-  //       isClickHold = false
-  //     }, 500)
-  //     isClickHold = true
-  //   }
-  // }
-
-  // if (reportData[2] === 241) {
-  //   if (isClickHold === false) {
-  //     robot.mouseClick('left', false)
-  //     setTimeout(() => {
-  //       isClickHold = false
-  //     }, 500)
-  //     isClickHold = true
-  //   }
-  // }
+  x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
 })
 
 if (isDraftLog) {
@@ -141,10 +121,10 @@ if (isDraftLog) {
   )
 }
 
-// in case of being unable to exit while testing
+// set flag if testing
 if (isExit) {
   setTimeout(() => {
     process.exit()
     //robot.moveMouse(0, 0)
-  }, 900000)
+  }, 9000)
 }
