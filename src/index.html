@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="index.css" />
+    <script defer src="render.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <h1>Tablet CTL-480</h1>
+      <p></p>
+      <div id="datawrapper">
+        <div id="bufferrow"><span>Raw data: </span><span class="datavalue" id="buffer"></span></div>
+        <div id="xrow">
+          <span>x: </span>
+          <span class="datavalue" id="x"></span>
+        </div>
+        <div id="yrow"><span>y: </span><span class="datavalue" id="y"></span></div>
+      </div>
+
+      <div id="canvaswrapper">
+        <canvas height="1440" width="2560" id="monitormirror"></canvas>
+      </div>
+      <div id="settingswrapper">
+        <h3>Tablet area</h3>
+        <div id="areawrapper">
+          <canvas height="9500" width="15200" id="areamirror"></canvas>
+          <canvas height="9500" width="15200" id="areaoverlaymirror"></canvas>
+          <div id="areavaluewrapper">
+            <div id="topbotwrapper">
+              <div class="tablecell">
+                <legend for="top">Top</legend>
+                <input id="top" type="number" />
+              </div>
+              <div class="tablecell">
+                <legend for="bottom">Bottom</legend>
+                <input id="bottom" type="number" />
+              </div>
+            </div>
+            <div id="leftrightwrapper">
+              <div class="tablecell">
+                <legend for="left">Left</legend>
+                <input id="left" type="number" />
+              </div>
+              <div class="tablecell">
+                <legend for="right">Right</legend>
+                <input id="right" type="number" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <span id="forceproptext">Force Proportions: </span>
+        <input checked="true" id="forcebox" type="checkbox" />
+      </div>
+    </div>
+  </body>
+</html>
