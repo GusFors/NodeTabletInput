@@ -9,13 +9,16 @@ if (require('electron-squirrel-startup')) {
 
 let settings = {
   isForcedProportions: true,
+  top: 0,
+  bottom: 8550,
+  left: 0,
+  right: 15200,
 }
 
 let mainWindow
 app.disableHardwareAcceleration()
 app.allowRendererProcessReuse = false
 const createWindow = () => {
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 800,
@@ -25,7 +28,6 @@ const createWindow = () => {
     },
   })
 
-  // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
 
   // Open the DevTools.
@@ -37,8 +39,9 @@ const createWindow = () => {
     mainWindow.webContents.send('message', report[0])
   }, 50)
 }
+
 ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg) // prints "ping"
+  console.log(arg)
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.value !== null || arg.value !== undefined) {
@@ -48,17 +51,12 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 })
 
 ipcMain.on('synchronous-message', (event, arg) => {
-  console.log(arg) // prints "ping"
+  console.log(arg)
   event.returnValue = 'pong'
 })
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+
 app.on('ready', createWindow)
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -66,15 +64,10 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
 
 let HID = require('node-hid')
 let robot = require('robotjs')
@@ -82,9 +75,7 @@ let colors = require('colors')
 
 function tabletInput() {
   //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
-  // setInterval(() => {
-  //   console.log('active...')
-  // }, 2000)
+
   let config = {
     vendorId: 1386,
     productId: 782,
@@ -107,13 +98,12 @@ function tabletInput() {
   let xS
   let yS
   let isClickHold = false
-  //https://www.w3schools.com/js/tryit.asp?filename=tryjs_bitwise_left
 
   tabletDevice.on('data', (reportData) => {
     let yScale
-    let xScale = 2560 / 15200 //  0.16842105263157894736842105263158
+    let xScale = 2560 / settings.right //  0.16842105263157894736842105263158
     intervalData[0] = reportData
-    settings.isForcedProportions ? (yScale = 1440 / 8550) : (yScale = 1440 / 9500)
+    settings.isForcedProportions ? (yScale = 1440 / settings.bottom) : (yScale = 1440 / 9500)
 
     if (reportData[1] != 2) {
       return
@@ -148,16 +138,4 @@ function tabletInput() {
     x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
   })
   return intervalData
-  //       rawUpdate(`Full Raw data:`, intervalData)
-  //       xPosUpdate(`raw xPosition: `, intervalData.slice(3, 5))
-  //       yPosUpdate(`raw yPosition:`, intervalData.slice(5, 7))
-
-  //       unscaledUpdate(`current unscaled Position: [x:`, x, ', y:', y, ']')
-  //       screenPosUpdate(`xScreen: ${Math.round(x * xScale)} yScreen: ${Math.round(y * yScale)}`)
-  //       reportIdUpdate(`reportID: ${intervalData[2] >> 1}`) // reportID
-
-  //       penTipUpdate(`Pen tip is pressed:`, intervalData[2] === 241 ? `${intervalData[2] === 241}`.green : `${intervalData[2] === 241}`.red)
-  //       outsideAreaUpdate(intervalData.slice(9, 10))
-  //       //console.log(`forcedProportions:`, isForcedProportions ? `${isForcedProportions}`.green : `${isForcedProportions}`.red)
-  //       // currentColor(robot.getPixelColor(x * xScale, y * yScale))
 }

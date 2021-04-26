@@ -77,3 +77,8 @@ document.querySelector('#forcebox').onclick = (event) => {
     areaOverlayContext.fillText((15200 / 9500).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
   }
 }
+
+document.querySelector('#sensitivity').oninput = function () {
+  console.log(this.value)
+  document.querySelector('#slidervalue').innerHTML = `${this.value}x`
+}

@@ -85,6 +85,8 @@ input[type='number'] {
   -moz-appearance: textfield;
   margin-right: 10px;
   width: 80px;
+  background-color: rgba(176, 195, 199, 0.582);
+  border: none;
 }
 
 legend {
@@ -117,4 +119,38 @@ legend {
 
 #forceproptext {
   font-size: 14px;
+}
+
+#slidercontainer {
+  margin-top: 10px;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 200px;
+  height: 5px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%; 
+  background: #4cacaf;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4c9baf;
+  cursor: pointer;
 }
