@@ -143,7 +143,7 @@ legend {
   width: 15px;
   height: 15px;
   border-radius: 50%; 
-  background: #4cacaf;
+  background: #5acdd1;
   cursor: pointer;
 }
 
@@ -151,6 +151,6 @@ legend {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #4c9baf;
+  background: #66cde7;
   cursor: pointer;
 }

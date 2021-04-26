@@ -13,6 +13,7 @@ let settings = {
   bottom: 8550,
   left: 0,
   right: 15200,
+  multiplier: 1,
 }
 
 let mainWindow
@@ -44,10 +45,13 @@ ipcMain.on('asynchronous-message', (event, arg) => {
   console.log(arg)
   event.reply('asynchronous-reply', 'pong')
 
-  if (arg.value !== null || arg.value !== undefined) {
+  if (arg.id === 'forcebox') {
     settings.isForcedProportions = arg.value
+    console.log('forced proportions are: ' + settings.isForcedProportions)
   }
-  console.log('forced proportions are: ' + settings.isForcedProportions)
+  if (arg.id === 'sens') {
+    settings.multiplier = arg.multiplier
+  }
 })
 
 ipcMain.on('synchronous-message', (event, arg) => {
@@ -101,9 +105,9 @@ function tabletInput() {
 
   tabletDevice.on('data', (reportData) => {
     let yScale
-    let xScale = 2560 / settings.right //  0.16842105263157894736842105263158
+    let xScale = 2560 / (settings.right / settings.multiplier) //  0.16842105263157894736842105263158
     intervalData[0] = reportData
-    settings.isForcedProportions ? (yScale = 1440 / settings.bottom) : (yScale = 1440 / 9500)
+    settings.isForcedProportions ? (yScale = 1440 / (settings.bottom / settings.multiplier)) : (yScale = 1440 / 9500)
 
     if (reportData[1] != 2) {
       return

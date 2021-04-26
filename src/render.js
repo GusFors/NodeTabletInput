@@ -81,4 +81,8 @@ document.querySelector('#forcebox').onclick = (event) => {
 document.querySelector('#sensitivity').oninput = function () {
   console.log(this.value)
   document.querySelector('#slidervalue').innerHTML = `${this.value}x`
+  ipcRenderer.send('asynchronous-message', {
+    id: 'sens',
+    multiplier: this.value,
+  })
 }
