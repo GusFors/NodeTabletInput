@@ -7,7 +7,7 @@ const perfObserver = new PerformanceObserver((items) => {
   })
 })
 
-//perfObserver.observe({ entryTypes: ['measure'], buffer: true })
+perfObserver.observe({ entryTypes: ['measure'], buffer: true })
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -17,10 +17,10 @@ if (require('electron-squirrel-startup')) {
 
 let settings = {
   isForcedProportions: true,
-  top: 0,
-  bottom: 8550,
-  left: 0,
-  right: 15200,
+  top: 290,
+  bottom: 7152,
+  left: 2767,
+  right: 14967,
   multiplier: 1,
 }
 
@@ -62,6 +62,10 @@ ipcMain.on('asynchronous-message', (event, arg) => {
   }
 
   if (arg.id === 'wacomArea') {
+    settings.top = arg.top
+    settings.bottom = arg.bottom
+    settings.left = arg.left
+    settings.right = arg.right
   }
 })
 
@@ -129,12 +133,30 @@ function tabletInput() {
     x = reportData[3] | (reportData[4] << 8)
     y = reportData[5] | (reportData[6] << 8)
 
-    if (y > 8550 && settings.isForcedProportions) {
-      y = 8550
+    // if (y > 8550 && settings.isForcedProportions) {
+    //   y = 8550
+    // }
+
+    xS = (x - settings.left) * xScale
+    yS = (y - settings.top) * yScale
+
+    if (xS > 2560) {
+      xS = 2560
     }
 
-    xS = x * xScale
-    yS = y * yScale
+    if (xS < 0) {
+      xS = 0
+    }
+
+    if (yS > 1440) {
+      yS = 1440
+    }
+
+    if (yS < 0) {
+      yS = 0
+    }
+
+  //  console.log(xS, x - settings.left)
 
     // pressure
     if (reportData[7] > 0) {
