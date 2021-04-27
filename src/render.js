@@ -8,7 +8,7 @@ const areaOverlayMirror = document.querySelector('#areaoverlaymirror')
 const areaOverlayContext = areaOverlayMirror.getContext('2d')
 
 const areaTextColor = 'rgba(255, 255, 255, 1)'
-const areaOverlayColor = 'rgba(64,224,208, 0.7)'
+const areaOverlayColor = 'rgba(164,164,174, 0.9)'
 areaOverlayContext.fillStyle = areaOverlayColor
 areaOverlayContext.textAlign = 'center'
 areaOverlayContext.font = '2000px serif'

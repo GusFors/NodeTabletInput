@@ -1,5 +1,13 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
+const { performance, PerformanceObserver } = require('perf_hooks')
+const perfObserver = new PerformanceObserver((items) => {
+  items.getEntries().forEach((entry) => {
+    console.log(entry)
+  })
+})
+
+//perfObserver.observe({ entryTypes: ['measure'], buffer: true })
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -17,7 +25,7 @@ let settings = {
 }
 
 let mainWindow
-app.disableHardwareAcceleration()
+//app.disableHardwareAcceleration()
 app.allowRendererProcessReuse = false
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -38,7 +46,7 @@ const createWindow = () => {
   let report = tabletInput()
   setInterval(() => {
     mainWindow.webContents.send('message', report[0])
-  }, 50)
+  }, 20)
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {
@@ -51,6 +59,9 @@ ipcMain.on('asynchronous-message', (event, arg) => {
   }
   if (arg.id === 'sens') {
     settings.multiplier = arg.multiplier
+  }
+
+  if (arg.id === 'wacomArea') {
   }
 })
 
@@ -104,10 +115,11 @@ function tabletInput() {
   let isClickHold = false
 
   tabletDevice.on('data', (reportData) => {
+    performance.mark('example-start')
     let yScale
-    let xScale = 2560 / (settings.right / settings.multiplier) //  0.16842105263157894736842105263158
+    let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158
     intervalData[0] = reportData
-    settings.isForcedProportions ? (yScale = 1440 / (settings.bottom / settings.multiplier)) : (yScale = 1440 / 9500)
+    settings.isForcedProportions ? (yScale = 1440 / ((settings.bottom - settings.top) / settings.multiplier)) : (yScale = 1440 / 9500)
 
     if (reportData[1] != 2) {
       return
@@ -133,13 +145,13 @@ function tabletInput() {
     }
 
     if (reportData[7] === 0) {
-      // console.log('no pressure'.red)
       isClickHold = false
       robot.mouseToggle('up', 'left')
     }
-    //  intervalData[2] === 241 ? robot.mouseClick('left', false) : false // basically autoclicker atm, TODO fix hold instead
 
     x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
+    performance.mark('example-end')
+    performance.measure('example', 'example-start', 'example-end')
   })
   return intervalData
 }
