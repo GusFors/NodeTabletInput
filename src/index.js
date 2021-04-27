@@ -7,7 +7,7 @@ const perfObserver = new PerformanceObserver((items) => {
   })
 })
 
-perfObserver.observe({ entryTypes: ['measure'], buffer: true })
+//perfObserver.observe({ entryTypes: ['measure'], buffer: true })
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -17,10 +17,10 @@ if (require('electron-squirrel-startup')) {
 
 let settings = {
   isForcedProportions: true,
-  top: 2427,
-  bottom: 9289,
-  left: 1975,
-  right: 14175,
+  top: 0,
+  bottom: 8550,
+  left: 0,
+  right: 15200,
   multiplier: 1,
 }
 
@@ -129,8 +129,6 @@ function tabletInput() {
     let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158
     intervalData[0] = reportData
     settings.isForcedProportions ? (yScale = 1440 / ((settings.bottom - settings.top) / settings.multiplier)) : (yScale = 1440 / 9500)
-
-    
 
     if (reportData[1] != 2) {
       return

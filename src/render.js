@@ -94,7 +94,7 @@ document.querySelector('#forcebox').onclick = (event) => {
   }
 }
 
-document.querySelector('#sensitivity').oninput = function () {
+document.querySelector('#sensitivity').onchange = function () {
   console.log(this.value)
   document.querySelector('#slidervalue').innerHTML = `${this.value}x`
   ipcRenderer.send('asynchronous-message', {
