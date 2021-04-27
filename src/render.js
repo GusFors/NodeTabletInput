@@ -86,3 +86,18 @@ document.querySelector('#sensitivity').oninput = function () {
     multiplier: this.value,
   })
 }
+
+document.querySelector('#apply').onclick = (event) => {
+  let top = document.querySelector('#top')
+  let bottom = document.querySelector('#bottom')
+  let right = document.querySelector('#right')
+  let left = document.querySelector('#left')
+console.log('app')
+  ipcRenderer.send('asynchronous-message', {
+    id: 'wacomArea',
+    top: top.value,
+    bottom: bottom.value,
+    left: left.value,
+    right: right.value,
+  })
+}

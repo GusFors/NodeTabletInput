@@ -46,7 +46,7 @@ const createWindow = () => {
   let report = tabletInput()
   setInterval(() => {
     mainWindow.webContents.send('message', report[0])
-  }, 20)
+  }, 30)
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {
