@@ -82,6 +82,8 @@ document.querySelector('#sensitivity').oninput = function () {
   })
 }
 
+let areaSettings
+
 ipcRenderer.send('asynchronous-message', {
   id: 'loadSettings',
 })
@@ -100,9 +102,24 @@ document.querySelector('#apply').onclick = (event) => {
     left: left.value,
     right: right.value,
   })
+  console.log(areaSettings)
+  areaOverlayContext.clearRect(0, 0, areaOverlayMirror.width, areaOverlayMirror.height)
+
+  console.log(areaSettings.left + (areaSettings.right - areaSettings.left) / 2)
+  areaOverlayContext.fillStyle = areaOverlayColor
+  areaOverlayContext.fillRect(left.value, topInput.value, right.value - left.value, bottom.value - topInput.value)
+
+  areaOverlayContext.fillStyle = areaTextColor
+  areaOverlayContext.fillText(
+    ((right.value - left.value) / (bottom.value - topInput.value)).toFixed(3),
+    areaOverlayMirror.width / 2,
+    areaOverlayMirror.height / 2
+  )
 }
 
 ipc.on('settings', (event, settings) => {
+  areaSettings = settings
+
   console.log(settings)
   topInput.value = settings.top
   bottom.value = settings.bottom

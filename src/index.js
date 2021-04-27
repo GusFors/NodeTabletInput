@@ -130,6 +130,8 @@ function tabletInput() {
     intervalData[0] = reportData
     settings.isForcedProportions ? (yScale = 1440 / ((settings.bottom - settings.top) / settings.multiplier)) : (yScale = 1440 / 9500)
 
+    
+
     if (reportData[1] != 2) {
       return
     }
