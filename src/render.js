@@ -1,4 +1,8 @@
 const ipc = require('electron').ipcRenderer
+const { ipcRenderer } = require('electron')
+
+ipcRenderer.on('asynchronous-reply', (event, arg) => {})
+// ipcRenderer.send('asynchronous-message', 'ping')
 
 const screenMirror = document.querySelector('#monitormirror')
 const screenMirrorContext = screenMirror.getContext('2d')
@@ -24,7 +28,7 @@ if (document.querySelector('#forcebox').checked) {
   areaOverlayContext.fillText((15200 / 9500).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
 }
 
-ipc.on('message', (event, positionData) => {
+ipc.on('data', (event, positionData) => {
   // console.log(message) // logs out "Hello second window!"
   //console.log(positionData[1])
   if (positionData[1] === 2) {
@@ -41,16 +45,7 @@ ipc.on('message', (event, positionData) => {
     screenMirrorContext.fillRect(Math.round(xScale), Math.round(yScale), 30, 30)
   }
 })
-const { ipcRenderer } = require('electron')
-console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 
-ipcRenderer.on('asynchronous-reply', (event, arg) => {})
-// ipcRenderer.send('asynchronous-message', 'ping')
-
-// document.querySelector('body').onclick = (event)=> {
-
-//   event.preventDefault()
-// }
 document.querySelector('#forcebox').onclick = (event) => {
   console.log(document.querySelector('#forcebox').checked)
 
@@ -87,17 +82,30 @@ document.querySelector('#sensitivity').oninput = function () {
   })
 }
 
+ipcRenderer.send('asynchronous-message', {
+  id: 'loadSettings',
+})
+
+let topInput = document.querySelector('#top')
+let bottom = document.querySelector('#bottom')
+let right = document.querySelector('#right')
+let left = document.querySelector('#left')
+
 document.querySelector('#apply').onclick = (event) => {
-  let top = document.querySelector('#top')
-  let bottom = document.querySelector('#bottom')
-  let right = document.querySelector('#right')
-  let left = document.querySelector('#left')
-console.log('app')
+  console.log('app')
   ipcRenderer.send('asynchronous-message', {
     id: 'wacomArea',
-    top: top.value,
+    top: topInput.value,
     bottom: bottom.value,
     left: left.value,
     right: right.value,
   })
 }
+
+ipc.on('settings', (event, settings) => {
+  console.log(settings)
+  topInput.value = settings.top
+  bottom.value = settings.bottom
+  right.value = settings.right
+  left.value = settings.left
+})

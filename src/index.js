@@ -17,10 +17,10 @@ if (require('electron-squirrel-startup')) {
 
 let settings = {
   isForcedProportions: true,
-  top: 290,
-  bottom: 7152,
-  left: 2767,
-  right: 14967,
+  top: 2427,
+  bottom: 9289,
+  left: 1975,
+  right: 14175,
   multiplier: 1,
 }
 
@@ -43,15 +43,20 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools()
   //
   // mainWindow.webContents.send()
+
   let report = tabletInput()
   setInterval(() => {
-    mainWindow.webContents.send('message', report[0])
+    mainWindow.webContents.send('data', report[0])
   }, 30)
 }
 
 ipcMain.on('asynchronous-message', (event, arg) => {
   console.log(arg)
   event.reply('asynchronous-reply', 'pong')
+
+  if (arg.id === 'loadSettings') {
+    mainWindow.webContents.send('settings', settings)
+  }
 
   if (arg.id === 'forcebox') {
     settings.isForcedProportions = arg.value
@@ -156,7 +161,7 @@ function tabletInput() {
       yS = 0
     }
 
-  //  console.log(xS, x - settings.left)
+    //  console.log(xS, x - settings.left)
 
     // pressure
     if (reportData[7] > 0) {
