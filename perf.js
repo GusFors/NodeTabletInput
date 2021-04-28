@@ -11,3 +11,4 @@ setTimeout(() => {
   performance.mark('example-end')
   performance.measure('example', 'example-start', 'example-end')
 }, 3000)
+

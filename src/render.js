@@ -50,7 +50,6 @@ areaOverlayContext.textAlign = 'center'
 areaOverlayContext.font = '2000px serif'
 
 ipc.on('data', (event, positionData) => {
-  // console.log(message) // logs out "Hello second window!"
   //console.log(positionData[1])
   if (positionData[1] === 2) {
     let x = positionData[3] | (positionData[4] << 8)
