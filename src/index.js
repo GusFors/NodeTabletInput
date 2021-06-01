@@ -7,11 +7,8 @@ const perfObserver = new PerformanceObserver((items) => {
   })
 })
 
-//perfObserver.observe({ entryTypes: ['measure'], buffer: true })
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
-  // eslint-disable-line global-require
   app.quit()
 }
 
@@ -96,6 +93,40 @@ let HID = require('node-hid')
 let robot = require('robotjs')
 let colors = require('colors')
 
+let configs = [
+  {
+    vendorId: 1386,
+    productId: 782,
+    name: 'Wacom CTL-480',
+    path: '\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}',
+    serialNumber: '\t',
+    manufacturer: 'Wacom Co.,Ltd.',
+    product: 'Intuos PS',
+    release: 256,
+    interface: -1,
+    usagePage: 65280,
+    usage: 10,
+  },
+  {
+    vendorId: 1386,
+    productId: 770,
+  },
+]
+
+function tabletDetector() {
+  let allDevices = HID.devices()
+  let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
+
+  for (let i = 0; i < wacDevices.length; i++) {
+    for (let x = 0; x < configs.length; x++) {
+      if (configs[x].productId === wacDevices[i].productId) {
+        console.log(configs[x])
+        return wacDevices[i]
+      }
+    }
+  }
+}
+
 function tabletInput() {
   //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
 
@@ -112,7 +143,8 @@ function tabletInput() {
     usage: 10,
   }
 
-  let tabletDevice = new HID.HID(config.path)
+  let detectedTablet = tabletDetector()
+  let tabletDevice = new HID.HID(detectedTablet.vendorId, detectedTablet.productId)
   robot.setMouseDelay(0)
 
   let intervalData = []
