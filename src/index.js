@@ -116,15 +116,18 @@ let configs = [
 function tabletDetector() {
   let allDevices = HID.devices()
   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
+  let tabletMatches = []
 
   for (let i = 0; i < wacDevices.length; i++) {
     for (let x = 0; x < configs.length; x++) {
-      if (configs[x].productId === wacDevices[i].productId) {
-        console.log(configs[x])
-        return wacDevices[i]
+      if (configs[x].productId === wacDevices[i].productId && wacDevices[i].usage === 10) {
+        console.log(wacDevices[i])
+        tabletMatches.push(wacDevices[i])
+        //return wacDevices[i]
       }
     }
   }
+  return tabletMatches
 }
 
 function tabletInput() {
@@ -143,8 +146,10 @@ function tabletInput() {
     usage: 10,
   }
 
-  let detectedTablet = tabletDetector()
-  let tabletDevice = new HID.HID(detectedTablet.vendorId, detectedTablet.productId)
+  let detectedTablets = tabletDetector()
+  console.log(detectedTablets)
+  console.log(detectedTablets[0].vendorId, detectedTablets[0].productId)
+  let tabletDevice = new HID.HID(detectedTablets[0].path)
   robot.setMouseDelay(0)
 
   let intervalData = []
@@ -155,6 +160,7 @@ function tabletInput() {
   let isClickHold = false
 
   tabletDevice.on('data', (reportData) => {
+    //console.log(reportData.length)
     performance.mark('example-start')
     let yScale
     let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158

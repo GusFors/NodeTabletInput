@@ -31,6 +31,7 @@ let configs = [
 function tabletDetector() {
   let allDevices = HID.devices()
   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
+  console.log(wacDevices)
   for (let i = 0; i < wacDevices.length; i++) {
     for (let x = 0; x < configs.length; x++) {
       if (configs[x].productId === wacDevices[i].productId) {
