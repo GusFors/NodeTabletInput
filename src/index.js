@@ -41,17 +41,18 @@ const createWindow = async () => {
   // mainWindow.webContents.send()
 
   let report = tabletInput(await detector.awaitPath)
+  settings.name = await detector.name
   setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
 }
 
-ipcMain.on('asynchronous-message', (event, arg) => {
+ipcMain.on('asynchronous-message', async (event, arg) => {
   console.log(arg)
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.id === 'loadSettings') {
-    mainWindow.webContents.send('settings', settings)
+    mainWindow.webContents.send('settings', { ...settings, name: await detector.name })
   }
 
   if (arg.id === 'forcebox') {

@@ -24,6 +24,8 @@ ipc.on('settings', (event, settings) => {
   right.value = settings.right
   left.value = settings.left
 
+  document.querySelector('#tabletname').innerText = settings.name
+
   if (document.querySelector('#forcebox').checked) {
     areaOverlayContext.fillRect(left.value, topInput.value, right.value - left.value, bottom.value - topInput.value)
     areaOverlayContext.fillStyle = areaTextColor

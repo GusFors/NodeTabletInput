@@ -24,8 +24,18 @@ let configs = [
 const detector = {
   devicePath: '',
   ready: false,
+  name: new Promise((resolve, reject) => {
+    let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
+    configs.forEach((config) => {
+      wacomDevices.forEach((device) => {
+        if (config.productId === device.productId) {
+          return resolve(config.name)
+        }
+      })
+    })
+  }),
   awaitPath: new Promise((resolve, reject) => {
-    readTest(1, resolve, reject)
+    readTest(1, resolve, tabletDetector())
   }),
 }
 
@@ -33,26 +43,26 @@ function tabletDetector() {
   let allDevices = HID.devices()
   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
   let tabletMatches = []
-
+  let tabletName
   for (let i = 0; i < wacDevices.length; i++) {
     for (let x = 0; x < configs.length; x++) {
       if (configs[x].productId === wacDevices[i].productId) {
         tabletMatches.push(wacDevices[i])
+        tabletName = configs[x].name
       }
     }
   }
   return tabletMatches
 }
 
-function readTest(i, promiseResolve, promiseReject) {
+function readTest(i, promiseResolve, dataReadArray) {
   console.log(i)
-  let detectedTablets = tabletDetector()
-  // console.log(detectedTablets)
-  if (i === detectedTablets.length) {
+
+  if (i === dataReadArray.length) {
     i = 0
   }
 
-  tabletDevice = new HID.HID(detectedTablets[i].path)
+  tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
     if (err) {
       console.log(err)
@@ -62,19 +72,19 @@ function readTest(i, promiseResolve, promiseReject) {
       clearTimeout(tryReadTimeout)
       tabletDevice.close()
 
-      detector.devicePath = detectedTablets[i].path
+      detector.devicePath = dataReadArray[i].path
       detector.ready = true
 
-      return promiseResolve(detectedTablets[i].path)
+      return promiseResolve(dataReadArray[i].path)
     }
   })
 
   let tryReadTimeout = setTimeout(() => {
     tabletDevice.close()
-    if (i === detectedTablets.length - 1) {
-      readTest(0, promiseResolve)
+    if (i === dataReadArray.length - 1) {
+      readTest(0, promiseResolve, dataReadArray)
     } else {
-      readTest(i + 1, promiseResolve)
+      readTest(i + 1, promiseResolve, dataReadArray)
     }
   }, 100)
 }
