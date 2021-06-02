@@ -1,11 +1,10 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { performance, PerformanceObserver } = require('perf_hooks')
-const perfObserver = new PerformanceObserver((items) => {
-  items.getEntries().forEach((entry) => {
-    console.log(entry)
-  })
-})
+const detector = require('./deviceDetectorLooper')
+
+// let detectedTablets = detector.tabletDetector()
+
+// let devPath = detector.readTest(1)
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -24,7 +23,7 @@ let settings = {
 let mainWindow
 //app.disableHardwareAcceleration()
 app.allowRendererProcessReuse = false
-const createWindow = () => {
+const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 800,
@@ -37,10 +36,11 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
 
   mainWindow.webContents.openDevTools()
-  //
+
+  console.log(await detector.awaitPath, 'JAAAAAAAA')
   // mainWindow.webContents.send()
 
-  let report = tabletInput()
+  let report = tabletInput(await detector.awaitPath)
   setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
@@ -92,64 +92,13 @@ app.on('activate', () => {
 let HID = require('node-hid')
 let robot = require('robotjs')
 let colors = require('colors')
+const { read } = require('fs')
 
-let configs = [
-  {
-    vendorId: 1386,
-    productId: 782,
-    name: 'Wacom CTL-480',
-    path: '\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}',
-    serialNumber: '\t',
-    manufacturer: 'Wacom Co.,Ltd.',
-    product: 'Intuos PS',
-    release: 256,
-    interface: -1,
-    usagePage: 65280,
-    usage: 10,
-  },
-  {
-    vendorId: 1386,
-    productId: 770,
-  },
-]
-
-function tabletDetector() {
-  let allDevices = HID.devices()
-  let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
-  let tabletMatches = []
-
-  for (let i = 0; i < wacDevices.length; i++) {
-    for (let x = 0; x < configs.length; x++) {
-      if (configs[x].productId === wacDevices[i].productId && wacDevices[i].usage === 10) {
-        console.log(wacDevices[i])
-        tabletMatches.push(wacDevices[i])
-        //return wacDevices[i]
-      }
-    }
-  }
-  return tabletMatches
-}
-
-function tabletInput() {
+function tabletInput(tabletDevicePath) {
   //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
 
-  let config = {
-    vendorId: 1386,
-    productId: 782,
-    path: '\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}',
-    serialNumber: '\t',
-    manufacturer: 'Wacom Co.,Ltd.',
-    product: 'Intuos PS',
-    release: 256,
-    interface: -1,
-    usagePage: 65280,
-    usage: 10,
-  }
+  let tabletHID = new HID.HID(tabletDevicePath)
 
-  let detectedTablets = tabletDetector()
-  console.log(detectedTablets)
-  console.log(detectedTablets[0].vendorId, detectedTablets[0].productId)
-  let tabletDevice = new HID.HID(detectedTablets[0].path)
   robot.setMouseDelay(0)
 
   let intervalData = []
@@ -159,9 +108,10 @@ function tabletInput() {
   let yS
   let isClickHold = false
 
-  tabletDevice.on('data', (reportData) => {
+  tabletHID.on('data', (reportData) => {
     //console.log(reportData.length)
-    performance.mark('example-start')
+    //console.log(reportData)
+
     let yScale
     let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158
     intervalData[0] = reportData
@@ -214,8 +164,6 @@ function tabletInput() {
     }
 
     x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
-    performance.mark('example-end')
-    performance.measure('example', 'example-start', 'example-end')
   })
   return intervalData
 }
