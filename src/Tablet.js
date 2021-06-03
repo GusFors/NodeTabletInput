@@ -5,13 +5,17 @@ let Detector = require('./DeviceDetectorLooper')
 
 module.exports = Tablet = {
   tabletHID: null,
-  async tabletInput(tabletDevicePath) {
-    // when restarting
-
+  async tabletInput(isRestart) {
+    // when restarting, currently crashing when trying to close() previous HID-stream
+    // console.log(this.tabletHID)
+    // this.tabletHID.close()
+    // this.tabletHID = null
     let detector = new Detector()
 
     this.tabletHID = new HID.HID(await detector.awaitPath())
     this.settings.name = await detector.getName()
+    console.log(this.settings.name)
+
     robot.setMouseDelay(0)
 
     let intervalData = []

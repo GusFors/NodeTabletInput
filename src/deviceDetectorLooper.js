@@ -30,7 +30,7 @@ class Detector {
   }
   awaitPath() {
     return new Promise((resolve, reject) => {
-      tryReadTest(1, resolve, tabletDetector())
+      tryReadTest(0, resolve, tabletDetector())
     })
   }
   refreshPath() {
@@ -95,7 +95,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     } else {
       tryReadTest(i + 1, promiseResolve, dataReadArray)
     }
-  }, 200)
+  }, 100)
 }
 
 module.exports = Detector
