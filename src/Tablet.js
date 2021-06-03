@@ -9,7 +9,13 @@ module.exports = Tablet = {
     // when restarting, currently crashing when trying to close() previous HID-stream
     // console.log(this.tabletHID)
     // this.tabletHID.close()
-    // this.tabletHID = null
+    // this.tabletHID = null'
+    console.log(this)
+    if (isRestart) {
+      console.log(this.tabletHID)
+      this.tabletHID.pause()
+      this.tabletHID = null
+    }
     let detector = new Detector()
 
     this.tabletHID = new HID.HID(await detector.awaitPath())

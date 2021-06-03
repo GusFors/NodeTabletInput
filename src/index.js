@@ -89,6 +89,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     // tabletHID.close()
     clearInterval(reportInterval)
     //Tablet.closeTablet()
+    // Tablet.closeTablet()
     const report = await Tablet.tabletInput(true)
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
