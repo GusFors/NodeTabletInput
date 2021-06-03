@@ -1,5 +1,6 @@
 let HID = require('node-hid')
 
+// TODO load configs from json, add 460,470,471,472,4100,PTH460
 let configs = [
   {
     vendorId: 1386,

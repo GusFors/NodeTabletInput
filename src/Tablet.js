@@ -3,10 +3,16 @@ let robot = require('robotjs')
 const { read } = require('fs')
 
 module.exports = Tablet = {
+  tabletHID: null,
   tabletInput(tabletDevicePath) {
     //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
 
-    let tabletHID = new HID.HID(tabletDevicePath)
+    if (this.tabletHID) {
+      this.tabletHID.close()
+      this.tabletHID = null
+    }
+
+    this.tabletHID = new HID.HID(tabletDevicePath)
 
     robot.setMouseDelay(0)
 
@@ -17,14 +23,14 @@ module.exports = Tablet = {
     let yS
     let isClickHold = false
 
-    tabletHID.on('data', (reportData) => {
+    this.tabletHID.on('data', (reportData) => {
       //console.log(reportData.length)
       //console.log(reportData)
 
       let yScale
-      let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158
+      let xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier) //  0.16842105263157894736842105263158
       intervalData[0] = reportData
-      settings.isForcedProportions ? (yScale = 1440 / ((settings.bottom - settings.top) / settings.multiplier)) : (yScale = 1440 / 9500)
+      this.settings.isForcedProportions ? (yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)) : (yScale = 1440 / 9500)
 
       if (reportData[1] != 2) {
         return
@@ -34,12 +40,12 @@ module.exports = Tablet = {
       x = reportData[3] | (reportData[4] << 8)
       y = reportData[5] | (reportData[6] << 8)
 
-      // if (y > 8550 && settings.isForcedProportions) {
+      // if (y > 8550 && this.settings.isForcedProportions) {
       //   y = 8550
       // }
 
-      xS = (x - settings.left) * xScale
-      yS = (y - settings.top) * yScale
+      xS = (x - this.settings.left) * xScale
+      yS = (y - this.settings.top) * yScale
 
       if (xS > 2560) {
         xS = 2560
@@ -57,7 +63,7 @@ module.exports = Tablet = {
         yS = 0
       }
 
-      //  console.log(xS, x - settings.left)
+      //  console.log(xS, x - this.settings.left)
 
       // pressure
       if (reportData[7] > 0) {
@@ -76,4 +82,25 @@ module.exports = Tablet = {
     })
     return intervalData
   },
+  closeTablet() {
+    this.tabletHID.close()
+    this.tabletHID = null
+  },
+  settings: {
+    isForcedProportions: true,
+    top: 0,
+    bottom: 8550,
+    left: 0,
+    right: 15200,
+    multiplier: 1,
+  },
+}
+
+let settings = {
+  isForcedProportions: true,
+  top: 0,
+  bottom: 8550,
+  left: 0,
+  right: 15200,
+  multiplier: 1,
 }

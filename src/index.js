@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const detector = require('./DeviceDetectorLooper')
-const processKiller = require('./ProcessKiller')
+const Detector = require('./DeviceDetectorLooper')
+const ProcessKiller = require('./ProcessKiller')
+const Tablet = require('./Tablet')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -34,11 +35,11 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
-  // processKiller.killStandardDrivers()
+  // ProcessKiller.killStandardDrivers()
   // mainWindow.webContents.send()
 
-  const report = tabletInput(await detector.awaitPath)
-  settings.name = await detector.name
+  const report = Tablet.tabletInput(await Detector.awaitPath)
+  Tablet.settings.name = await Detector.name
 
   reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
@@ -50,60 +51,60 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.id === 'loadSettings') {
-    mainWindow.webContents.send('settings', { ...settings, name: await detector.name })
+    mainWindow.webContents.send('settings', { ...Tablet.settings, name: await Detector.name })
   }
 
   if (arg.id === 'forcebox') {
-    settings.isForcedProportions = arg.value
-    console.log('forced proportions are: ' + settings.isForcedProportions)
+    Tablet.settings.isForcedProportions = arg.value
+    console.log('forced proportions are: ' + Tablet.settings.isForcedProportions)
   }
   if (arg.id === 'sens') {
-    settings.multiplier = arg.multiplier
+    Tablet.settings.multiplier = arg.multiplier
   }
 
   if (arg.id === 'wacomArea') {
-    settings.top = arg.top
-    settings.bottom = arg.bottom
-    settings.left = arg.left
-    settings.right = arg.right
+    Tablet.settings.top = arg.top
+    Tablet.settings.bottom = arg.bottom
+    Tablet.settings.left = arg.left
+    Tablet.settings.right = arg.right
   }
 
   if (arg.id === 'stopP') {
-    processKiller.stopWSP()
+    ProcessKiller.stopWSP()
   }
 
   if (arg.id === 'startP') {
-    processKiller.startWSP()
+    ProcessKiller.startWSP()
   }
 
   if (arg.id === 'stopC') {
-    processKiller.stopWSC()
+    ProcessKiller.stopWSC()
   }
 
   if (arg.id === 'startC') {
-    processKiller.startWSC()
+    ProcessKiller.startWSC()
   }
 
   if (arg.id === 'killD') {
-    processKiller.killWDC()
+    ProcessKiller.killWDC()
   }
 
   if (arg.id === 'killT') {
-    processKiller.killWT()
+    ProcessKiller.killWT()
   }
 
   if (arg.id === 'restartN') {
-    tabletHID.close()
+    //tabletHID.close()
     clearInterval(reportInterval)
 
-    const report = tabletInput(await detector.awaitPath)
+    const report = Tablet.tabletInput(await Detector.awaitPath)
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
     }, 30)
   }
 
   if (arg.id === 'killN') {
-    tabletHID.close()
+    Tablet.closeTablet()
     clearInterval(reportInterval)
   }
 })
@@ -131,76 +132,3 @@ let HID = require('node-hid')
 let robot = require('robotjs')
 const { read } = require('fs')
 let tabletHID
-function tabletInput(tabletDevicePath) {
-  //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
-
-  tabletHID = new HID.HID(tabletDevicePath)
-
-  robot.setMouseDelay(0)
-
-  let intervalData = []
-  let x
-  let y
-  let xS
-  let yS
-  let isClickHold = false
-
-  tabletHID.on('data', (reportData) => {
-    //console.log(reportData.length)
-    //console.log(reportData)
-
-    let yScale
-    let xScale = 2560 / ((settings.right - settings.left) / settings.multiplier) //  0.16842105263157894736842105263158
-    intervalData[0] = reportData
-    settings.isForcedProportions ? (yScale = 1440 / ((settings.bottom - settings.top) / settings.multiplier)) : (yScale = 1440 / 9500)
-
-    if (reportData[1] != 2) {
-      return
-    }
-
-    // TODO check if these really are correct for all positions
-    x = reportData[3] | (reportData[4] << 8)
-    y = reportData[5] | (reportData[6] << 8)
-
-    // if (y > 8550 && settings.isForcedProportions) {
-    //   y = 8550
-    // }
-
-    xS = (x - settings.left) * xScale
-    yS = (y - settings.top) * yScale
-
-    if (xS > 2560) {
-      xS = 2560
-    }
-
-    if (xS < 0) {
-      xS = 0
-    }
-
-    if (yS > 1440) {
-      yS = 1440
-    }
-
-    if (yS < 0) {
-      yS = 0
-    }
-
-    //  console.log(xS, x - settings.left)
-
-    // pressure
-    if (reportData[7] > 0) {
-      if (isClickHold === false) {
-        robot.mouseToggle('down', 'left')
-        isClickHold = true
-      }
-    }
-
-    if (reportData[7] === 0) {
-      isClickHold = false
-      robot.mouseToggle('up', 'left')
-    }
-
-    x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
-  })
-  return intervalData
-}
