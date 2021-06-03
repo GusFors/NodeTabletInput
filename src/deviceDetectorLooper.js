@@ -52,30 +52,6 @@ class Detector {
   }
 }
 
-let DetectorOld = {
-  devicePath: '',
-  ready: false,
-  name: new Promise((resolve, reject) => {
-    let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
-    configs.forEach((config) => {
-      wacomDevices.forEach((device) => {
-        if (config.productId === device.productId) {
-          return resolve(config.name)
-        }
-      })
-    })
-  }),
-  awaitPath: new Promise((resolve, reject) => {
-    tryReadTest(1, resolve, tabletDetector())
-  }),
-  refreshPath: () => {
-    this.awaitPath = null
-    this.awaitPath = new Promise((resolve, reject) => {
-      tryReadTest(1, resolve, tabletDetector())
-    })
-  },
-}
-
 function tabletDetector() {
   let allDevices = HID.devices()
   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
@@ -97,7 +73,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     i = 0
   }
 
-  tabletDevice = new HID.HID(dataReadArray[i].path)
+  let tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
     if (err) {
       console.log('Unable to read device, trying next.. ', err)
@@ -106,9 +82,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     if (data) {
       clearTimeout(tryReadTimeout)
       tabletDevice.close()
-
-      Detector.devicePath = dataReadArray[i].path
-      Detector.ready = true
+      console.log('Success reading device')
 
       return promiseResolve(dataReadArray[i].path)
     }

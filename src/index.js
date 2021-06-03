@@ -31,7 +31,7 @@ const createWindow = async () => {
 
   const report = await Tablet.tabletInput()
   mainWindow.webContents.send('settings', Tablet.settings)
-  
+
   reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
@@ -85,14 +85,14 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   }
 
   if (arg.id === 'restartN') {
-    //tabletHID.close()
+    // tabletHID.close()
     clearInterval(reportInterval)
 
     const report = await Tablet.tabletInput()
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
     }, 30)
-    mainWindow.webContents.send('settings', { ...Tablet.settings })
+    mainWindow.webContents.send('settings', Tablet.settings)
   }
 
   if (arg.id === 'killN') {

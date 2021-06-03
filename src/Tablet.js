@@ -7,12 +7,6 @@ module.exports = Tablet = {
   tabletHID: null,
   async tabletInput(tabletDevicePath) {
     // when restarting
-    if (this.tabletHID) {
-      this.tabletHID.close()
-      this.tabletHID = null
-    }
-
-    console.log('hello?')
 
     let detector = new Detector()
 
