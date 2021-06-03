@@ -127,3 +127,39 @@ document.querySelector('#apply').onclick = (event) => {
     areaOverlayMirror.height / 2
   )
 }
+
+document.querySelector('#stopP').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'stopP',
+  })
+}
+
+document.querySelector('#startP').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'startP',
+  })
+}
+
+document.querySelector('#stopC').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'stopC',
+  })
+}
+
+document.querySelector('#startC').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'startC',
+  })
+}
+
+document.querySelector('#killD').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'killD',
+  })
+}
+
+document.querySelector('#killT').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'killT',
+  })
+}

@@ -1,17 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const detector = require('./deviceDetectorLooper')
-const processKiller = require('./processKiller')
-// let detectedTablets = detector.tabletDetector()
-
-// let devPath = detector.readTest(1)
+const detector = require('./DeviceDetectorLooper')
+const processKiller = require('./ProcessKiller')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit()
 }
-
-processKiller.killStandardDrivers()
 
 let settings = {
   isForcedProportions: true,
@@ -27,8 +22,8 @@ let mainWindow
 app.allowRendererProcessReuse = false
 const createWindow = async () => {
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 800,
+    width: 1600,
+    height: 1000,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -38,10 +33,12 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
+  // processKiller.killStandardDrivers()
   // mainWindow.webContents.send()
 
   const report = tabletInput(await detector.awaitPath)
   settings.name = await detector.name
+
   setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
@@ -69,6 +66,30 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     settings.left = arg.left
     settings.right = arg.right
   }
+
+  if (arg.id === 'stopP') {
+    processKiller.stopWSP()
+  }
+
+  if (arg.id === 'startP') {
+    processKiller.startWSP()
+  }
+
+  if (arg.id === 'stopC') {
+    processKiller.stopWSC()
+  }
+
+  if (arg.id === 'startC') {
+    processKiller.startWSC()
+  }
+
+  if (arg.id === 'killD') {
+    processKiller.killWDC()
+  }
+
+  if (arg.id === 'killT') {
+    processKiller.killWT()
+  }
 })
 
 ipcMain.on('synchronous-message', (event, arg) => {
@@ -92,7 +113,6 @@ app.on('activate', () => {
 
 let HID = require('node-hid')
 let robot = require('robotjs')
-let colors = require('colors')
 const { read } = require('fs')
 
 function tabletInput(tabletDevicePath) {
