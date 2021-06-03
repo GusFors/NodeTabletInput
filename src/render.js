@@ -11,9 +11,9 @@ ipcRenderer.on('asynchronous-reply', (event, arg) => {})
 
 let areaSettings
 
-ipcRenderer.send('asynchronous-message', {
-  id: 'loadSettings',
-})
+// ipcRenderer.send('asynchronous-message', {
+//   id: 'loadSettings',
+// })
 
 ipc.on('settings', (event, settings) => {
   areaSettings = settings

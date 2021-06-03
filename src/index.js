@@ -1,21 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const Detector = require('./DeviceDetectorLooper')
+let Detector = require('./DeviceDetectorLooper')
 const ProcessKiller = require('./ProcessKiller')
 const Tablet = require('./Tablet')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit()
-}
-
-let settings = {
-  isForcedProportions: true,
-  top: 0,
-  bottom: 8550,
-  left: 0,
-  right: 15200,
-  multiplier: 1,
 }
 
 let mainWindow
@@ -38,9 +29,9 @@ const createWindow = async () => {
   // ProcessKiller.killStandardDrivers()
   // mainWindow.webContents.send()
 
-  const report = Tablet.tabletInput(await Detector.awaitPath)
-  Tablet.settings.name = await Detector.name
-
+  const report = await Tablet.tabletInput()
+  mainWindow.webContents.send('settings', Tablet.settings)
+  
   reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
@@ -51,7 +42,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.id === 'loadSettings') {
-    mainWindow.webContents.send('settings', { ...Tablet.settings, name: await Detector.name })
+    mainWindow.webContents.send('settings', Tablet.settings)
   }
 
   if (arg.id === 'forcebox') {
@@ -97,10 +88,11 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     //tabletHID.close()
     clearInterval(reportInterval)
 
-    const report = Tablet.tabletInput(await Detector.awaitPath)
+    const report = await Tablet.tabletInput()
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
     }, 30)
+    mainWindow.webContents.send('settings', { ...Tablet.settings })
   }
 
   if (arg.id === 'killN') {

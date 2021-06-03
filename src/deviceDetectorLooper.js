@@ -22,7 +22,37 @@ let configs = [
   },
 ]
 
-const detector = {
+class Detector {
+  constructor() {
+    this.devicePath
+    this.ready
+    this.modelName = 'placeholder'
+  }
+  awaitPath() {
+    return new Promise((resolve, reject) => {
+      tryReadTest(1, resolve, tabletDetector())
+    })
+  }
+  refreshPath() {
+    this.awaitPath = new Promise((resolve, reject) => {
+      tryReadTest(1, resolve, tabletDetector())
+    })
+  }
+  getName() {
+    return new Promise((resolve, reject) => {
+      let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
+      configs.forEach((config) => {
+        wacomDevices.forEach((device) => {
+          if (config.productId === device.productId) {
+            return resolve(config.name)
+          }
+        })
+      })
+    })
+  }
+}
+
+let DetectorOld = {
   devicePath: '',
   ready: false,
   name: new Promise((resolve, reject) => {
@@ -38,6 +68,12 @@ const detector = {
   awaitPath: new Promise((resolve, reject) => {
     tryReadTest(1, resolve, tabletDetector())
   }),
+  refreshPath: () => {
+    this.awaitPath = null
+    this.awaitPath = new Promise((resolve, reject) => {
+      tryReadTest(1, resolve, tabletDetector())
+    })
+  },
 }
 
 function tabletDetector() {
@@ -71,8 +107,8 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
       clearTimeout(tryReadTimeout)
       tabletDevice.close()
 
-      detector.devicePath = dataReadArray[i].path
-      detector.ready = true
+      Detector.devicePath = dataReadArray[i].path
+      Detector.ready = true
 
       return promiseResolve(dataReadArray[i].path)
     }
@@ -85,7 +121,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     } else {
       tryReadTest(i + 1, promiseResolve, dataReadArray)
     }
-  }, 100)
+  }, 200)
 }
 
-module.exports = detector
+module.exports = Detector

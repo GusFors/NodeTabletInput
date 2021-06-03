@@ -1,19 +1,23 @@
 let HID = require('node-hid')
 let robot = require('robotjs')
 const { read } = require('fs')
+let Detector = require('./DeviceDetectorLooper')
 
 module.exports = Tablet = {
   tabletHID: null,
-  tabletInput(tabletDevicePath) {
-    //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
-
+  async tabletInput(tabletDevicePath) {
+    // when restarting
     if (this.tabletHID) {
       this.tabletHID.close()
       this.tabletHID = null
     }
 
-    this.tabletHID = new HID.HID(tabletDevicePath)
+    console.log('hello?')
 
+    let detector = new Detector()
+
+    this.tabletHID = new HID.HID(await detector.awaitPath())
+    this.settings.name = await detector.getName()
     robot.setMouseDelay(0)
 
     let intervalData = []
@@ -24,9 +28,6 @@ module.exports = Tablet = {
     let isClickHold = false
 
     this.tabletHID.on('data', (reportData) => {
-      //console.log(reportData.length)
-      //console.log(reportData)
-
       let yScale
       let xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier) //  0.16842105263157894736842105263158
       intervalData[0] = reportData
@@ -93,14 +94,6 @@ module.exports = Tablet = {
     left: 0,
     right: 15200,
     multiplier: 1,
+    name: 'unset',
   },
-}
-
-let settings = {
-  isForcedProportions: true,
-  top: 0,
-  bottom: 8550,
-  left: 0,
-  right: 15200,
-  multiplier: 1,
 }
