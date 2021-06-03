@@ -92,6 +92,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
     }, 30)
+
     mainWindow.webContents.send('settings', Tablet.settings)
   }
 
@@ -99,11 +100,6 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     Tablet.closeTablet()
     clearInterval(reportInterval)
   }
-})
-
-ipcMain.on('synchronous-message', (event, arg) => {
-  console.log(arg)
-  event.returnValue = 'pong'
 })
 
 app.on('ready', createWindow)
@@ -120,7 +116,7 @@ app.on('activate', () => {
   }
 })
 
-let HID = require('node-hid')
-let robot = require('robotjs')
-const { read } = require('fs')
-let tabletHID
+// ipcMain.on('synchronous-message', (event, arg) => {
+//   console.log(arg)
+//   event.returnValue = 'pong'
+// })

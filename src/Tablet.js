@@ -10,17 +10,17 @@ module.exports = Tablet = {
     // console.log(this.tabletHID)
     // this.tabletHID.close()
     // this.tabletHID = null'
-    console.log(this)
+
     if (isRestart && this.tabletHID !== null) {
       console.log(this.tabletHID)
       this.tabletHID.pause()
       this.tabletHID = null
     }
+
     let detector = new Detector()
 
     this.tabletHID = new HID.HID(await detector.awaitPath())
     this.settings.name = await detector.getName()
-    console.log(this.settings.name)
 
     robot.setMouseDelay(0)
 
