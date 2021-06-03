@@ -163,3 +163,15 @@ document.querySelector('#killT').onclick = (event) => {
     id: 'killT',
   })
 }
+
+document.querySelector('#restartN').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'restartN',
+  })
+}
+
+document.querySelector('#killN').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'killN',
+  })
+}

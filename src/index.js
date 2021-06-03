@@ -18,6 +18,7 @@ let settings = {
 }
 
 let mainWindow
+let reportInterval
 //app.disableHardwareAcceleration()
 app.allowRendererProcessReuse = false
 const createWindow = async () => {
@@ -39,7 +40,7 @@ const createWindow = async () => {
   const report = tabletInput(await detector.awaitPath)
   settings.name = await detector.name
 
-  setInterval(() => {
+  reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
   }, 30)
 }
@@ -90,6 +91,21 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   if (arg.id === 'killT') {
     processKiller.killWT()
   }
+
+  if (arg.id === 'restartN') {
+    tabletHID.close()
+    clearInterval(reportInterval)
+
+    const report = tabletInput(await detector.awaitPath)
+    reportInterval = setInterval(() => {
+      mainWindow.webContents.send('data', report[0])
+    }, 30)
+  }
+
+  if (arg.id === 'killN') {
+    tabletHID.close()
+    clearInterval(reportInterval)
+  }
 })
 
 ipcMain.on('synchronous-message', (event, arg) => {
@@ -114,11 +130,11 @@ app.on('activate', () => {
 let HID = require('node-hid')
 let robot = require('robotjs')
 const { read } = require('fs')
-
+let tabletHID
 function tabletInput(tabletDevicePath) {
   //isForcedProportions ? (yScale = 0.16842105263157894736842105263158 * 2) : (yScale = 0.15157894736842105263157894736842)
 
-  let tabletHID = new HID.HID(tabletDevicePath)
+  tabletHID = new HID.HID(tabletDevicePath)
 
   robot.setMouseDelay(0)
 
