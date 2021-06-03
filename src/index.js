@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-let Detector = require('./DeviceDetectorLooper')
+let Detector = require('./DeviceDetector')
 const ProcessKiller = require('./ProcessKiller')
 const Tablet = require('./Tablet')
 
@@ -86,10 +86,8 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   }
 
   if (arg.id === 'restartN') {
-    // tabletHID.close()
     clearInterval(reportInterval)
-    //Tablet.closeTablet()
-    // Tablet.closeTablet()
+
     const report = await Tablet.tabletInput(true)
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])

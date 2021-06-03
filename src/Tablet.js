@@ -1,7 +1,7 @@
 let HID = require('node-hid')
 let robot = require('robotjs')
 const { read } = require('fs')
-let Detector = require('./DeviceDetectorLooper')
+let Detector = require('./DeviceDetector')
 
 module.exports = Tablet = {
   tabletHID: null,
@@ -11,7 +11,7 @@ module.exports = Tablet = {
     // this.tabletHID.close()
     // this.tabletHID = null'
     console.log(this)
-    if (isRestart) {
+    if (isRestart && this.tabletHID !== null) {
       console.log(this.tabletHID)
       this.tabletHID.pause()
       this.tabletHID = null
