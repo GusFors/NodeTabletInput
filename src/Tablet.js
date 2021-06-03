@@ -88,7 +88,7 @@ module.exports = Tablet = {
     return intervalData
   },
   closeTablet() {
-    this.tabletHID.close()
+    this.tabletHID.pause()
     this.tabletHID = null
   },
   settings: {

@@ -20,6 +20,11 @@ let configs = [
     productId: 770,
     name: 'Wacom CTH-480',
   },
+  {
+    vendorId: 1386,
+    productId: 886,
+    name: 'Wacom CTL-4100WL',
+  },
 ]
 
 class Detector {
@@ -73,6 +78,8 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     i = 0
   }
 
+  // TODO, check why CTH randomly is detected but doesnt send data
+
   let tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
     if (err) {
@@ -95,7 +102,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     } else {
       tryReadTest(i + 1, promiseResolve, dataReadArray)
     }
-  }, 100)
+  }, 200)
 }
 
 module.exports = Detector
