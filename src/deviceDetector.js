@@ -43,3 +43,4 @@ function tabletDetector() {
 }
 
 tabletDetector()
+// https://docs.google.com/spreadsheets/d/125LNzGmidy1gagwYUt12tRhrNdrWFHhWon7kxWY7iWU/edit#gid=1969407640

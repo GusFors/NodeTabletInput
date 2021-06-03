@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const detector = require('./deviceDetectorLooper')
-
+const processKiller = require('./processKiller')
 // let detectedTablets = detector.tabletDetector()
 
 // let devPath = detector.readTest(1)
@@ -10,6 +10,8 @@ const detector = require('./deviceDetectorLooper')
 if (require('electron-squirrel-startup')) {
   app.quit()
 }
+
+processKiller.killStandardDrivers()
 
 let settings = {
   isForcedProportions: true,
@@ -34,13 +36,11 @@ const createWindow = async () => {
   })
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
-
   mainWindow.webContents.openDevTools()
 
-  console.log(await detector.awaitPath, 'JAAAAAAAA')
   // mainWindow.webContents.send()
 
-  let report = tabletInput(await detector.awaitPath)
+  const report = tabletInput(await detector.awaitPath)
   settings.name = await detector.name
   setInterval(() => {
     mainWindow.webContents.send('data', report[0])

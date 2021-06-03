@@ -35,7 +35,7 @@ const detector = {
     })
   }),
   awaitPath: new Promise((resolve, reject) => {
-    readTest(1, resolve, tabletDetector())
+    tryReadTest(1, resolve, tabletDetector())
   }),
 }
 
@@ -55,9 +55,7 @@ function tabletDetector() {
   return tabletMatches
 }
 
-function readTest(i, promiseResolve, dataReadArray) {
-  console.log(i)
-
+function tryReadTest(i, promiseResolve, dataReadArray) {
   if (i === dataReadArray.length) {
     i = 0
   }
@@ -65,7 +63,7 @@ function readTest(i, promiseResolve, dataReadArray) {
   tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
     if (err) {
-      console.log(err)
+      console.log('Unable to read device, trying next.. ', err)
     }
 
     if (data) {
@@ -82,9 +80,9 @@ function readTest(i, promiseResolve, dataReadArray) {
   let tryReadTimeout = setTimeout(() => {
     tabletDevice.close()
     if (i === dataReadArray.length - 1) {
-      readTest(0, promiseResolve, dataReadArray)
+      tryReadTest(0, promiseResolve, dataReadArray)
     } else {
-      readTest(i + 1, promiseResolve, dataReadArray)
+      tryReadTest(i + 1, promiseResolve, dataReadArray)
     }
   }, 100)
 }
