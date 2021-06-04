@@ -49,7 +49,7 @@ const areaTextColor = 'rgba(255, 255, 255, 1)'
 const areaOverlayColor = 'rgba(164,164,174, 0.9)'
 areaOverlayContext.fillStyle = areaOverlayColor
 areaOverlayContext.textAlign = 'center'
-areaOverlayContext.font = '2000px serif'
+areaOverlayContext.font = '20px serif'
 
 ipc.on('data', (event, positionData) => {
   //console.log(positionData[1])
@@ -118,11 +118,11 @@ document.querySelector('#apply').onclick = (event) => {
 
   console.log(areaSettings.left + (areaSettings.right - areaSettings.left) / 2)
   areaOverlayContext.fillStyle = areaOverlayColor
-  areaOverlayContext.fillRect(left.value, topInput.value, right.value - left.value, bottom.value - topInput.value)
+  areaOverlayContext.fillRect(left.value / 100, topInput.value / 100, (right.value - left.value) / 100, (bottom.value - topInput.value) / 100)
 
   areaOverlayContext.fillStyle = areaTextColor
   areaOverlayContext.fillText(
-    ((right.value - left.value) / (bottom.value - topInput.value)).toFixed(3),
+    ((right.value - left.value) / 100 / ((bottom.value - topInput.value) / 100)).toFixed(3),
     areaOverlayMirror.width / 2,
     areaOverlayMirror.height / 2
   )

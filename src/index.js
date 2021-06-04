@@ -26,12 +26,9 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
-  // ProcessKiller.killStandardDrivers()
-  // mainWindow.webContents.send()
-
   const report = await Tablet.tabletInput()
   console.log(Tablet.settings.name)
-  //mainWindow.webContents.send('settings', Tablet.settings)
+  mainWindow.webContents.send('settings', Tablet.settings)
 
   reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
@@ -43,6 +40,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.id === 'loadSettings') {
+    console.log(Tablet.settings)
     mainWindow.webContents.send('settings', Tablet.settings)
   }
 

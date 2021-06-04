@@ -1,6 +1,8 @@
 let HID = require('node-hid')
 
 // TODO load configs from json, add 460,470,471,472,4100,PTH460
+// Add Tablet height and width
+// Remove unused and duplicate code
 let configs = [
   {
     vendorId: 1386,
@@ -14,16 +16,29 @@ let configs = [
     interface: -1,
     usagePage: 65280,
     usage: 10,
+    xMax: 15200,
+    yMax: 9500,
   },
   {
     vendorId: 1386,
     productId: 770,
     name: 'Wacom CTH-480',
+    xMax: 15200,
+    yMax: 9500,
   },
   {
     vendorId: 1386,
     productId: 886,
     name: 'Wacom CTL-4100WL',
+    xMax: 15200,
+    yMax: 9500,
+  },
+  {
+    vendorId: 1386,
+    productId: 890,
+    name: 'Wacom CTL-472',
+    xMax: 15200,
+    yMax: 9500,
   },
 ]
 
@@ -55,6 +70,18 @@ class Detector {
       })
     })
   }
+  getConfig() {
+    return new Promise((resolve, reject) => {
+      let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
+      configs.forEach((config) => {
+        wacomDevices.forEach((device) => {
+          if (config.productId === device.productId) {
+            return resolve(config)
+          }
+        })
+      })
+    })
+  }
 }
 
 function tabletDetector() {
@@ -78,7 +105,7 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
     i = 0
   }
 
-  // TODO, check why CTH randomly is detected but doesnt send data
+  // TODO, check why CTH sometimes is detected but doesnt send data
 
   let tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
