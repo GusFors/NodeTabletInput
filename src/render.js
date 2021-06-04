@@ -25,12 +25,13 @@ ipc.on('settings', (event, settings) => {
   left.value = settings.left
 
   document.querySelector('#tabletname').innerText = settings.name
-
+  document.querySelector('#areamirror').height = settings.yMax / 100
+  document.querySelector('#areamirror').width = settings.xMax / 100
   if (document.querySelector('#forcebox').checked) {
-    areaOverlayContext.fillRect(left.value, topInput.value, right.value - left.value, bottom.value - topInput.value)
+    areaOverlayContext.fillRect(left.value / 100, topInput.value / 100, (right.value - left.value) / 100, (bottom.value - topInput.value) / 100)
     areaOverlayContext.fillStyle = areaTextColor
-    areaOverlayContext.fillText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
-    areaOverlayContext.strokeText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+    areaOverlayContext.fillText((152 / 85.5).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+    areaOverlayContext.strokeText((152 / 85.5).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
   } else {
     areaOverlayContext.fillRect(0, 0, 15200, 9500)
     areaOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)'
@@ -85,13 +86,13 @@ document.querySelector('#forcebox').onclick = (event) => {
   areaOverlayContext.fillStyle = areaOverlayColor
 
   if (document.querySelector('#forcebox').checked) {
-    areaOverlayContext.fillRect(0, 0, 15200, 8550)
+    areaOverlayContext.fillRect(0, 0, 152, 85.5)
     areaOverlayContext.fillStyle = areaTextColor
-    areaOverlayContext.fillText((15200 / 8550).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+    areaOverlayContext.fillText((152 / 85.5).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
   } else {
-    areaOverlayContext.fillRect(0, 0, 15200, 9500)
+    areaOverlayContext.fillRect(0, 0, 152, 95)
     areaOverlayContext.fillStyle = areaTextColor
-    areaOverlayContext.fillText((15200 / 9500).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
+    areaOverlayContext.fillText((152 / 95).toFixed(3), areaOverlayMirror.width / 2, areaOverlayMirror.height / 2)
   }
 }
 
