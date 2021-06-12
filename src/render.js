@@ -27,6 +27,9 @@ ipc.on('settings', (event, settings) => {
   document.querySelector('#tabletname').innerText = settings.name
   document.querySelector('#areamirror').height = settings.yMax / 100
   document.querySelector('#areamirror').width = settings.xMax / 100
+  areaOverlayMirror.height = settings.yMax / 100
+  areaOverlayMirror.width = settings.xMax / 100
+  areaOverlayContext.fillStyle = areaOverlayColor
   if (document.querySelector('#forcebox').checked) {
     areaOverlayContext.fillRect(left.value / 100, topInput.value / 100, (right.value - left.value) / 100, (bottom.value - topInput.value) / 100)
     areaOverlayContext.fillStyle = areaTextColor

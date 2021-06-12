@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-let Detector = require('./DeviceDetector')
 const ProcessKiller = require('./ProcessKiller')
 const Tablet = require('./Tablet')
 
@@ -27,7 +26,7 @@ const createWindow = async () => {
   mainWindow.webContents.openDevTools()
 
   const report = await Tablet.tabletInput()
-  console.log(Tablet.settings.name)
+  //console.log(Tablet.settings.name)
   mainWindow.webContents.send('settings', Tablet.settings)
 
   reportInterval = setInterval(() => {

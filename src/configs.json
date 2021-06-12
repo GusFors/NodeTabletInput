@@ -1,1 +1,32 @@
-[{"vendorId":1386,"productId":782,"name":"Wacom CTL-480","path":"\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}","serialNumber":"\t","manufacturer":"Wacom Co.,Ltd.","product":"Intuos PS","release":256,"interface":-1,"usagePage":65280,"usage":10},{"vendorId":1386,"productId":770,"name":"Wacom CTH-480"},{"vendorId":1386,"productId":886,"name":"Wacom CTL-4100WL"}]
+[
+    {
+        "vendorId": 1386,
+        "productId": 782,
+        "name": "Wacom CTL-480",
+        "top": 0,
+        "left": 0,
+        "bottom": 8550,
+        "right": 15100,
+        "multiplier": 1,
+        "isForcedProportions": true,
+        "xMax": 15200,
+        "yMax": 9500
+    },
+    {
+        "vendorId": 1386,
+        "productId": 770,
+        "name": "Wacom CTH-480"
+    },
+    {
+        "vendorId": 1386,
+        "productId": 886,
+        "name": "Wacom CTL-4100WL"
+    },
+    {
+        "vendorId": 1386,
+        "productId": 890,
+        "name": "Wacom CTL-472",
+        "xMax": 15200,
+        "yMax": 9500
+    }
+]

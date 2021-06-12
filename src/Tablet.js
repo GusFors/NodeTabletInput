@@ -1,7 +1,8 @@
-let HID = require('node-hid')
-let robot = require('robotjs')
-let Detector = require('./DeviceDetector')
-
+const HID = require('node-hid')
+const robot = require('robotjs')
+const Detector = require('./DeviceDetector')
+const ConfigHandler = require('./ConfigHandler')
+const detector = new Detector()
 // https://github.com/satanch/unipresser/blob/master/install.js alternativ?
 // https://nodejs.org/api/addons.html
 
@@ -14,18 +15,16 @@ module.exports = Tablet = {
     // this.tabletHID = null'
 
     if (isRestart && this.tabletHID !== null) {
-      console.log(this.tabletHID)
+      //console.log(this.tabletHID)
       this.tabletHID.pause()
       this.tabletHID = null
     }
 
-    let detector = new Detector()
-
     this.tabletHID = new HID.HID(await detector.awaitPath())
-    this.settings = { ...this.settings, ...(await detector.getConfig()) }
-
+    this.settings = await detector.getConfig()
+    console.log(this.settings, 'loaded settings ta blet')
     robot.setMouseDelay(0)
-    console.log(this.settings)
+    //  console.log(this.settings)
     let intervalData = []
     let x
     let y
@@ -37,7 +36,7 @@ module.exports = Tablet = {
       let yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
       let xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
       intervalData[0] = reportData
-
+      //console.log(reportData)
       // TODO fix forcedProportions for different areas
       // this.settings.isForcedProportions ? (yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)) : (yScale = 1440 / 9500)
 
@@ -91,13 +90,5 @@ module.exports = Tablet = {
     this.tabletHID.pause()
     this.tabletHID = null
   },
-  settings: {
-    isForcedProportions: true,
-    top: 0,
-    bottom: 8550,
-    left: 0,
-    right: 15200,
-    multiplier: 1,
-    name: 'unset',
-  },
+  settings: detector.getConfig(),
 }

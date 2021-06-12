@@ -1,67 +1,42 @@
-let HID = require('node-hid')
-
+const HID = require('node-hid')
+const ConfigHandler = require('./ConfigHandler')
 // TODO load configs from json, add 460,470,471,472,4100,PTH460
 // Add Tablet height and width
 // Remove unused and duplicate code
-let configs = [
-  {
-    vendorId: 1386,
-    productId: 782,
-    name: 'Wacom CTL-480',
-    path: '\\\\?\\hid#vid_056a&pid_030e&col02#7&26e2e4fd&1&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}',
-    serialNumber: '\t',
-    manufacturer: 'Wacom Co.,Ltd.',
-    product: 'Intuos PS',
-    release: 256,
-    interface: -1,
-    usagePage: 65280,
-    usage: 10,
-    xMax: 15200,
-    yMax: 9500,
-  },
-  {
-    vendorId: 1386,
-    productId: 770,
-    name: 'Wacom CTH-480',
-    xMax: 15200,
-    yMax: 9500,
-  },
-  {
-    vendorId: 1386,
-    productId: 886,
-    name: 'Wacom CTL-4100WL',
-    xMax: 15200,
-    yMax: 9500,
-  },
-  {
-    vendorId: 1386,
-    productId: 890,
-    name: 'Wacom CTL-472',
-    xMax: 15200,
-    yMax: 9500,
-  },
-]
 
 class Detector {
   constructor() {
-    this.devicePath
-    this.ready
-    this.modelName = 'placeholder'
+    this.configs = new ConfigHandler().readConfigSync()
+  }
+  tabletDetector() {
+    let allDevices = HID.devices()
+    let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
+    let tabletMatches = []
+    let tabletName
+    for (let i = 0; i < wacDevices.length; i++) {
+      for (let x = 0; x < this.configs.length; x++) {
+        if (this.configs[x].productId === wacDevices[i].productId) {
+          tabletMatches.push(wacDevices[i])
+          tabletName = this.configs[x].name
+        }
+      }
+    }
+    return tabletMatches
   }
   awaitPath() {
     return new Promise((resolve, reject) => {
-      tryReadTest(0, resolve, tabletDetector())
+      tryReadTest(1, resolve, this.tabletDetector())
     })
   }
   refreshPath() {
     this.awaitPath = new Promise((resolve, reject) => {
-      tryReadTest(1, resolve, tabletDetector())
+      tryReadTest(1, resolve, this.tabletDetector())
     })
   }
   getName() {
     return new Promise((resolve, reject) => {
       let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
-      configs.forEach((config) => {
+      this.configs.forEach((config) => {
         wacomDevices.forEach((device) => {
           if (config.productId === device.productId) {
             return resolve(config.name)
@@ -73,7 +48,7 @@ class Detector {
   getConfig() {
     return new Promise((resolve, reject) => {
       let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
-      configs.forEach((config) => {
+      this.configs.forEach((config) => {
         wacomDevices.forEach((device) => {
           if (config.productId === device.productId) {
             return resolve(config)
@@ -84,21 +59,21 @@ class Detector {
   }
 }
 
-function tabletDetector() {
-  let allDevices = HID.devices()
-  let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
-  let tabletMatches = []
-  let tabletName
-  for (let i = 0; i < wacDevices.length; i++) {
-    for (let x = 0; x < configs.length; x++) {
-      if (configs[x].productId === wacDevices[i].productId) {
-        tabletMatches.push(wacDevices[i])
-        tabletName = configs[x].name
-      }
-    }
-  }
-  return tabletMatches
-}
+// function tabletDetector() {
+//   let allDevices = HID.devices()
+//   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
+//   let tabletMatches = []
+//   let tabletName
+//   for (let i = 0; i < wacDevices.length; i++) {
+//     for (let x = 0; x < configs.length; x++) {
+//       if (configs[x].productId === wacDevices[i].productId) {
+//         tabletMatches.push(wacDevices[i])
+//         tabletName = configs[x].name
+//       }
+//     }
+//   }
+//   return tabletMatches
+// }
 
 function tryReadTest(i, promiseResolve, dataReadArray) {
   if (i === dataReadArray.length) {
@@ -106,13 +81,13 @@ function tryReadTest(i, promiseResolve, dataReadArray) {
   }
 
   // TODO, check why CTH sometimes is detected but doesnt send data
-
+  // console.log(i + ' : ', dataReadArray[i].path)
   let tabletDevice = new HID.HID(dataReadArray[i].path)
   tabletDevice.read((err, data) => {
     if (err) {
       console.log('Unable to read device, trying next.. ', err)
     }
-
+    console.log(data)
     if (data) {
       clearTimeout(tryReadTimeout)
       tabletDevice.close()
