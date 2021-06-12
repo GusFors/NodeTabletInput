@@ -10,6 +10,8 @@ class Tablet {
   constructor() {
     this.tabletHID = null
     this.settings = null
+    this.xScale = null
+    this.yScale = null
   }
 
   async tabletInput(isRestart) {
@@ -26,6 +28,9 @@ class Tablet {
     this.tabletHID = new HID.HID(await deviceDetector.awaitPath())
     this.settings = await deviceDetector.getConfig()
 
+    this.xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
+    this.yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
+
     robot.setMouseDelay(0)
 
     let intervalData = []
@@ -36,10 +41,8 @@ class Tablet {
     let isClickHold = false
 
     this.tabletHID.on('data', (reportData) => {
-      let yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
-      let xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
       intervalData[0] = reportData
-      //console.log(reportData)
+
       // TODO fix forcedProportions for different areas
       // this.settings.isForcedProportions ? (yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)) : (yScale = 1440 / 9500)
 
@@ -51,8 +54,8 @@ class Tablet {
       x = reportData[3] | (reportData[4] << 8)
       y = reportData[5] | (reportData[6] << 8)
 
-      xS = (x - this.settings.left) * xScale
-      yS = (y - this.settings.top) * yScale
+      xS = (x - this.settings.left) * this.xScale
+      yS = (y - this.settings.top) * this.yScale
 
       if (xS > 2560) {
         xS = 2560
@@ -93,6 +96,11 @@ class Tablet {
   closeTablet() {
     this.tabletHID.pause()
     this.tabletHID = null
+  }
+
+  updateScale() {
+    this.xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
+    this.yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
   }
 }
 

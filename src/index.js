@@ -47,9 +47,11 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   if (arg.id === 'forcebox') {
     tablet.settings.isForcedProportions = arg.value
     console.log('forced proportions are: ' + tablet.settings.isForcedProportions)
+    tablet.updateScale()
   }
   if (arg.id === 'sens') {
     tablet.settings.multiplier = arg.multiplier
+    tablet.updateScale()
   }
 
   if (arg.id === 'wacomArea') {
@@ -57,6 +59,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     tablet.settings.bottom = arg.bottom
     tablet.settings.left = arg.left
     tablet.settings.right = arg.right
+    tablet.updateScale()
   }
 
   if (arg.id === 'stopP') {
