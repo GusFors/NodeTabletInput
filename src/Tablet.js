@@ -1,8 +1,8 @@
 const HID = require('node-hid')
 const robot = require('robotjs')
-const Detector = require('./DeviceDetector')
+const DeviceDetector = require('./DeviceDetector')
 const ConfigHandler = require('./ConfigHandler')
-const detector = new Detector()
+const deviceDetector = new DeviceDetector()
 // https://github.com/satanch/unipresser/blob/master/install.js alternativ?
 // https://nodejs.org/api/addons.html
 
@@ -20,8 +20,8 @@ module.exports = Tablet = {
       this.tabletHID = null
     }
 
-    this.tabletHID = new HID.HID(await detector.awaitPath())
-    this.settings = await detector.getConfig()
+    this.tabletHID = new HID.HID(await deviceDetector.awaitPath())
+    this.settings = await deviceDetector.getConfig()
     console.log(this.settings, 'loaded settings ta blet')
     robot.setMouseDelay(0)
     //  console.log(this.settings)
@@ -86,9 +86,10 @@ module.exports = Tablet = {
     })
     return intervalData
   },
+
   closeTablet() {
     this.tabletHID.pause()
     this.tabletHID = null
   },
-  settings: detector.getConfig(),
+  settings: deviceDetector.getConfig(),
 }

@@ -4,10 +4,11 @@ const ConfigHandler = require('./ConfigHandler')
 // Add Tablet height and width
 // Remove unused and duplicate code
 
-class Detector {
+class DeviceDetector {
   constructor() {
     this.configs = new ConfigHandler().readConfigSync()
   }
+
   tabletDetector() {
     let allDevices = HID.devices()
     let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
@@ -23,16 +24,19 @@ class Detector {
     }
     return tabletMatches
   }
+
   awaitPath() {
     return new Promise((resolve, reject) => {
-      tryReadTest(1, resolve, this.tabletDetector())
+      this.tryReadDevice(1, resolve, this.tabletDetector())
     })
   }
+
   refreshPath() {
     this.awaitPath = new Promise((resolve, reject) => {
-      tryReadTest(1, resolve, this.tabletDetector())
+      this.tryReadDevice(1, resolve, this.tabletDetector())
     })
   }
+
   getName() {
     return new Promise((resolve, reject) => {
       let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
@@ -45,6 +49,7 @@ class Detector {
       })
     })
   }
+
   getConfig() {
     return new Promise((resolve, reject) => {
       let wacomDevices = HID.devices().filter((device) => device.vendorId === 1386)
@@ -57,54 +62,38 @@ class Detector {
       })
     })
   }
-}
 
-// function tabletDetector() {
-//   let allDevices = HID.devices()
-//   let wacDevices = allDevices.filter((device) => device.vendorId === 1386)
-//   let tabletMatches = []
-//   let tabletName
-//   for (let i = 0; i < wacDevices.length; i++) {
-//     for (let x = 0; x < configs.length; x++) {
-//       if (configs[x].productId === wacDevices[i].productId) {
-//         tabletMatches.push(wacDevices[i])
-//         tabletName = configs[x].name
-//       }
-//     }
-//   }
-//   return tabletMatches
-// }
-
-function tryReadTest(i, promiseResolve, dataReadArray) {
-  if (i === dataReadArray.length) {
-    i = 0
-  }
-
-  // TODO, check why CTH sometimes is detected but doesnt send data
-  // console.log(i + ' : ', dataReadArray[i].path)
-  let tabletDevice = new HID.HID(dataReadArray[i].path)
-  tabletDevice.read((err, data) => {
-    if (err) {
-      console.log('Unable to read device, trying next.. ', err)
+  tryReadDevice(i, promiseResolve, dataReadArray) {
+    if (i === dataReadArray.length) {
+      i = 0
     }
-    console.log(data)
-    if (data) {
-      clearTimeout(tryReadTimeout)
+
+    // TODO, check why CTH sometimes is detected but doesnt send data
+    // console.log(i + ' : ', dataReadArray[i].path)
+    let tabletDevice = new HID.HID(dataReadArray[i].path)
+    tabletDevice.read((err, data) => {
+      if (err) {
+        console.log('Unable to read device, trying next.. ', err)
+      }
+      console.log(data)
+      if (data) {
+        clearTimeout(tryReadTimeout)
+        tabletDevice.close()
+        console.log('Success reading device')
+
+        return promiseResolve(dataReadArray[i].path)
+      }
+    })
+
+    let tryReadTimeout = setTimeout(() => {
       tabletDevice.close()
-      console.log('Success reading device')
-
-      return promiseResolve(dataReadArray[i].path)
-    }
-  })
-
-  let tryReadTimeout = setTimeout(() => {
-    tabletDevice.close()
-    if (i === dataReadArray.length - 1) {
-      tryReadTest(0, promiseResolve, dataReadArray)
-    } else {
-      tryReadTest(i + 1, promiseResolve, dataReadArray)
-    }
-  }, 200)
+      if (i === dataReadArray.length - 1) {
+        this.tryReadDevice(0, promiseResolve, dataReadArray)
+      } else {
+        this.tryReadDevice(i + 1, promiseResolve, dataReadArray)
+      }
+    }, 200)
+  }
 }
 
-module.exports = Detector
+module.exports = DeviceDetector
