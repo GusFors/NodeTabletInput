@@ -27,7 +27,7 @@ const createWindow = async () => {
   mainWindow.webContents.openDevTools()
 
   const report = await tablet.tabletInput()
-  //console.log(tablet.settings.name)
+
   mainWindow.webContents.send('settings', tablet.settings)
 
   reportInterval = setInterval(() => {
@@ -38,6 +38,8 @@ const createWindow = async () => {
 ipcMain.on('asynchronous-message', async (event, arg) => {
   console.log(arg)
   event.reply('asynchronous-reply', 'pong')
+
+  // switch statements?
 
   if (arg.id === 'loadSettings') {
     console.log(tablet.settings)

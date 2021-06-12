@@ -88,7 +88,7 @@ class Tablet {
         robot.mouseToggle('up', 'left')
       }
 
-      x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
+      x === 0 && y === 0 ? false : robot.moveMouse(xS, yS)
     })
     return intervalData
   }
