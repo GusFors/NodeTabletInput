@@ -12,6 +12,7 @@ class Tablet {
     this.settings = null
     this.xScale = null
     this.yScale = null
+    this.monitorResolution = robot.getScreenSize()
   }
 
   async tabletInput(isRestart) {
@@ -28,8 +29,8 @@ class Tablet {
     this.tabletHID = new HID.HID(await deviceDetector.awaitPath())
     this.settings = await deviceDetector.getConfig()
 
-    this.xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
-    this.yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
+    this.xScale = this.monitorResolution.width / ((this.settings.right - this.settings.left) / this.settings.multiplier)
+    this.yScale = this.monitorResolution.height / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
 
     robot.setMouseDelay(0)
 
@@ -99,9 +100,10 @@ class Tablet {
   }
 
   updateScale() {
-    this.xScale = 2560 / ((this.settings.right - this.settings.left) / this.settings.multiplier)
-    this.yScale = 1440 / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
+    this.xScale = this.monitorResolution.width / ((this.settings.right - this.settings.left) / this.settings.multiplier)
+    this.yScale = this.monitorResolution.height / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
   }
+  saveSettings() {}
 }
 
 module.exports = Tablet

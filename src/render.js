@@ -110,6 +110,7 @@ document.querySelector('#sensitivity').onchange = function () {
 
 document.querySelector('#apply').onclick = (event) => {
   console.log('app')
+  // just call it apply??
   ipcRenderer.send('asynchronous-message', {
     id: 'wacomArea',
     top: topInput.value,
@@ -130,6 +131,12 @@ document.querySelector('#apply').onclick = (event) => {
     areaOverlayMirror.width / 2,
     areaOverlayMirror.height / 2
   )
+}
+
+document.querySelector('#save').onclick = (event) => {
+  ipcRenderer.send('asynchronous-message', {
+    id: 'save',
+  })
 }
 
 document.querySelector('#stopP').onclick = (event) => {
