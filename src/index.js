@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const ProcessKiller = require('./ProcessKiller')
-const Tablet = require('./Tablet')
+const Tablet = require('./tablet')
+const tablet = new Tablet()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -25,9 +26,9 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
-  const report = await Tablet.tabletInput()
-  //console.log(Tablet.settings.name)
-  mainWindow.webContents.send('settings', Tablet.settings)
+  const report = await tablet.tabletInput()
+  //console.log(tablet.settings.name)
+  mainWindow.webContents.send('settings', tablet.settings)
 
   reportInterval = setInterval(() => {
     mainWindow.webContents.send('data', report[0])
@@ -39,23 +40,23 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   event.reply('asynchronous-reply', 'pong')
 
   if (arg.id === 'loadSettings') {
-    console.log(Tablet.settings)
-    mainWindow.webContents.send('settings', Tablet.settings)
+    console.log(tablet.settings)
+    mainWindow.webContents.send('settings', tablet.settings)
   }
 
   if (arg.id === 'forcebox') {
-    Tablet.settings.isForcedProportions = arg.value
-    console.log('forced proportions are: ' + Tablet.settings.isForcedProportions)
+    tablet.settings.isForcedProportions = arg.value
+    console.log('forced proportions are: ' + tablet.settings.isForcedProportions)
   }
   if (arg.id === 'sens') {
-    Tablet.settings.multiplier = arg.multiplier
+    tablet.settings.multiplier = arg.multiplier
   }
 
   if (arg.id === 'wacomArea') {
-    Tablet.settings.top = arg.top
-    Tablet.settings.bottom = arg.bottom
-    Tablet.settings.left = arg.left
-    Tablet.settings.right = arg.right
+    tablet.settings.top = arg.top
+    tablet.settings.bottom = arg.bottom
+    tablet.settings.left = arg.left
+    tablet.settings.right = arg.right
   }
 
   if (arg.id === 'stopP') {
@@ -85,16 +86,16 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   if (arg.id === 'restartN') {
     clearInterval(reportInterval)
 
-    const report = await Tablet.tabletInput(true)
+    const report = await tablet.tabletInput(true)
     reportInterval = setInterval(() => {
       mainWindow.webContents.send('data', report[0])
     }, 30)
 
-    mainWindow.webContents.send('settings', Tablet.settings)
+    mainWindow.webContents.send('settings', tablet.settings)
   }
 
   if (arg.id === 'killN') {
-    Tablet.closeTablet()
+    tablet.closeTablet()
     clearInterval(reportInterval)
   }
 })

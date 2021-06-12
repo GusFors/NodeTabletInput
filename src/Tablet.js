@@ -6,8 +6,12 @@ const deviceDetector = new DeviceDetector()
 // https://github.com/satanch/unipresser/blob/master/install.js alternativ?
 // https://nodejs.org/api/addons.html
 
-module.exports = Tablet = {
-  tabletHID: null,
+class Tablet {
+  constructor() {
+    this.tabletHID = null
+    this.settings = null
+  }
+
   async tabletInput(isRestart) {
     // when restarting, currently crashing when trying to close() previous HID-stream
     // console.log(this.tabletHID)
@@ -15,16 +19,15 @@ module.exports = Tablet = {
     // this.tabletHID = null'
 
     if (isRestart && this.tabletHID !== null) {
-      //console.log(this.tabletHID)
       this.tabletHID.pause()
       this.tabletHID = null
     }
 
     this.tabletHID = new HID.HID(await deviceDetector.awaitPath())
     this.settings = await deviceDetector.getConfig()
-    console.log(this.settings, 'loaded settings ta blet')
+
     robot.setMouseDelay(0)
-    //  console.log(this.settings)
+
     let intervalData = []
     let x
     let y
@@ -85,11 +88,12 @@ module.exports = Tablet = {
       x === 0 && y === 0 ? false : robot.moveMouse(xS, yS) // has to be set after clicks or else mcosu lags for some reason
     })
     return intervalData
-  },
+  }
 
   closeTablet() {
     this.tabletHID.pause()
     this.tabletHID = null
-  },
-  settings: deviceDetector.getConfig(),
+  }
 }
+
+module.exports = Tablet

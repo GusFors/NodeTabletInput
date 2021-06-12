@@ -27,13 +27,13 @@ class DeviceDetector {
 
   awaitPath() {
     return new Promise((resolve, reject) => {
-      this.tryReadDevice(1, resolve, this.tabletDetector())
+      this.tryReadDevice(0, resolve, this.tabletDetector())
     })
   }
 
   refreshPath() {
     this.awaitPath = new Promise((resolve, reject) => {
-      this.tryReadDevice(1, resolve, this.tabletDetector())
+      this.tryReadDevice(0, resolve, this.tabletDetector())
     })
   }
 
