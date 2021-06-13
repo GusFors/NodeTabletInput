@@ -3,6 +3,7 @@ const ConfigHandler = require('./ConfigHandler')
 // TODO load configs from json, add 460,470,471,472,4100,PTH460
 // Add Tablet height and width
 // Remove unused and duplicate code
+// Either use foreach or for-loops for all methods
 
 class DeviceDetector {
   constructor() {

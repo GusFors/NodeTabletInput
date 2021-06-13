@@ -66,13 +66,14 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   }
 
   if (arg.id === 'save') {
-    //TODO, which file should access ConfigHandler?
+    //TODO, send arg obj, let method handle each value, also add parseInt so numbers get stored properly as numbers in json
     tablet.settings.top = arg.top
     tablet.settings.bottom = arg.bottom
     tablet.settings.left = arg.left
     tablet.settings.right = arg.right
     tablet.settings.multiplier = parseFloat(arg.multiplier)
     tablet.saveSettings()
+    tablet.updateScale()
   }
 
   if (arg.id === 'stopP') {
