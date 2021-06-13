@@ -3,9 +3,6 @@ const path = require('path')
 const ProcessKiller = require('./ProcessKiller')
 const Tablet = require('./tablet')
 const tablet = new Tablet()
-const ConfigHandler = require('ConfigHandler')
-const { config } = require('process')
-const configHandler = new ConfigHandler()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -56,7 +53,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
   }
 
   if (arg.id === 'sens') {
-    tablet.settings.multiplier = arg.multiplier
+    tablet.settings.multiplier = parseFloat(arg.multiplier)
     tablet.updateScale()
   }
 
@@ -70,7 +67,12 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
 
   if (arg.id === 'save') {
     //TODO, which file should access ConfigHandler?
-    //configHandler.writeConfigSync()
+    tablet.settings.top = arg.top
+    tablet.settings.bottom = arg.bottom
+    tablet.settings.left = arg.left
+    tablet.settings.right = arg.right
+    tablet.settings.multiplier = parseFloat(arg.multiplier)
+    tablet.saveSettings()
   }
 
   if (arg.id === 'stopP') {

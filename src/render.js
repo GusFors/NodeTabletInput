@@ -136,6 +136,11 @@ document.querySelector('#apply').onclick = (event) => {
 document.querySelector('#save').onclick = (event) => {
   ipcRenderer.send('asynchronous-message', {
     id: 'save',
+    top: topInput.value,
+    bottom: bottom.value,
+    left: left.value,
+    right: right.value,
+    multiplier: document.querySelector('#sensitivity').value,
   })
 }
 

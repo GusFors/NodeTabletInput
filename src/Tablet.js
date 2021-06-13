@@ -103,7 +103,9 @@ class Tablet {
     this.xScale = this.monitorResolution.width / ((this.settings.right - this.settings.left) / this.settings.multiplier)
     this.yScale = this.monitorResolution.height / ((this.settings.bottom - this.settings.top) / this.settings.multiplier)
   }
-  saveSettings() {}
+  saveSettings() {
+    new ConfigHandler().writeConfigSync(this.settings)
+  }
 }
 
 module.exports = Tablet
