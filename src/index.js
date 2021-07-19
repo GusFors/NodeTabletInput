@@ -3,7 +3,8 @@ const path = require('path')
 const ProcessKiller = require('./ProcessKiller')
 const Tablet = require('./tablet')
 const tablet = new Tablet()
-
+// https://www.electronjs.org/docs/tutorial/performance#1-carelessly-including-modules
+// https://medium.com/actualbudget/the-horror-of-blocking-electrons-main-process-351bf11a763c
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit()
@@ -26,7 +27,7 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
-  const report = await tablet.tabletInput()
+  const report = await tablet.simpleTabletInput()
 
   mainWindow.webContents.send('settings', tablet.settings)
 
@@ -76,6 +77,7 @@ ipcMain.on('asynchronous-message', async (event, arg) => {
     tablet.updateScale()
   }
 
+  // TODO switch/case
   if (arg.id === 'stopP') {
     ProcessKiller.stopWSP()
   }

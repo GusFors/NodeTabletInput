@@ -80,7 +80,7 @@ class DeviceDetector {
       if (data) {
         clearTimeout(tryReadTimeout)
         tabletDevice.close()
-        console.log('Success reading device')
+        console.log('Success reading device with path: ', dataReadArray[i].path)
 
         return promiseResolve(dataReadArray[i].path)
       }

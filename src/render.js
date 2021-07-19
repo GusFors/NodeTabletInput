@@ -11,6 +11,17 @@ ipcRenderer.on('asynchronous-reply', (event, arg) => {})
 
 let areaSettings
 
+// function freeze(time) {
+//   const stop = new Date().getTime() + time
+//   while (new Date().getTime() < stop);
+// }
+
+// console.log('freeze 3s')
+// setTimeout(() => {
+//   freeze(30000)
+// }, 15000)
+// console.log('done')
+
 ipcRenderer.send('asynchronous-message', {
   id: 'loadSettings',
 })
