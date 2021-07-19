@@ -27,7 +27,7 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
   mainWindow.webContents.openDevTools()
 
-  const report = await tablet.simpleTabletInput()
+  const report = await tablet.tabletInput()
 
   mainWindow.webContents.send('settings', tablet.settings)
 

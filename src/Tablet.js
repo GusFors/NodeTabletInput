@@ -34,6 +34,7 @@ class Tablet {
     let y
     let xS
     let yS
+    let isClick = false
 
     this.tabletHID.on('data', (reportData) => {
       if (reportData[1] != 2) {
@@ -63,6 +64,32 @@ class Tablet {
       }
 
       x === 0 && y === 0 ? false : robot.moveMouse(xS, yS)
+
+      switch (reportData[2]) {
+        case 241:
+          if (isClick === false) {
+            isClick = true
+            robot.mouseToggle('down', 'left')
+          }
+          break
+        case 242:
+          if (!isClick) {
+            isClick = true
+            robot.mouseClick('left')
+          }
+          break
+        case 244:
+          if (!isClick) {
+            isClick = true
+            robot.mouseClick('right')
+          }
+          break
+        default:
+          if (isClick) {
+            isClick = false
+            robot.mouseToggle('up', 'left')
+          }
+      }
     })
     return 0
   }
@@ -87,7 +114,7 @@ class Tablet {
     let y
     let xS
     let yS
-    let isClickHold = false
+    let isClick = false
 
     const xBuffer = []
     const yBuffer = []
@@ -131,24 +158,36 @@ class Tablet {
       xBuffer.push(xS)
       yBuffer.push(yS)
 
-      // pressure
-      if (reportData[7] > 0) {
-        if (isClickHold === false) {
-          robot.mouseToggle('down', 'left')
-          isClickHold = true
-        }
-      }
-
-      if (reportData[7] === 0) {
-        isClickHold = false
-        robot.mouseToggle('up', 'left')
-      }
-
       x === 0 && y === 0 ? false : robot.moveMouse(this.averagePosition(xBuffer.slice(-2, -1)), this.averagePosition(yBuffer.slice(-2, -1)))
       setTimeout(() => {
         xBuffer.shift()
       }, 1000)
 
+      switch (reportData[2]) {
+        case 241:
+          if (isClick === false) {
+            isClick = true
+            robot.mouseToggle('down', 'left')
+          }
+          break
+        case 242:
+          if (!isClick) {
+            isClick = true
+            robot.mouseClick('left')
+          }
+          break
+        case 244:
+          if (!isClick) {
+            isClick = true
+            robot.mouseClick('right')
+          }
+          break
+        default:
+          if (isClick) {
+            isClick = false
+            robot.mouseToggle('up', 'left')
+          }
+      }
       // setTimeout(() => {
       //   x === 0 && y === 0 ? false : robot.moveMouse(xSBuff, ySBuff)
       // }, 50)
